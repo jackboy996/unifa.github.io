@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>unifa.launch - Fair Token Launch Platform</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Web3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.1.1/dist/web3.min.js"></script>
+    <!-- Ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist/ethers.umd.min.js"></script>
+    <!-- Coinbase Wallet SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@3.8.0/dist/coinbase-wallet-sdk.min.js"></script>
+    <!-- WalletConnect -->
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/client@1.8.0/dist/umd/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@1.8.0/dist/umd/index.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-500': '#080814',
+                        'dark-400': '#0d0d19',
+                        'primary-500': '#0073f5',
+                        'secondary-500': '#5d15f5',
+                        'accent-500': '#00c3ff',
+                        'success-500': '#00ff9d',
+                        'warning-500': '#ffaa00',
+                        'danger-500': '#ff4d4f',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080814;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #0073f5, #5d15f5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-border {
+            position: relative;
+            border-radius: 0.5rem;
+            z-index: 0;
+        }
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #0073f5, #5d15f5);
+            border-radius: 0.6rem;
+            z-index: -1;
+        }
+        
+        .card {
+            background-color: #0d0d19;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 115, 245, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #0073f5, #5d15f5);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 115, 245, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid #0073f5;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(0, 115, 245, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .input-field {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #0073f5;
+            box-shadow: 0 0 0 2px rgba(0, 115, 245, 0.2);
+        }
+        
+        .network-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .network-btn:hover, .network-btn.active {
+            border-color: #0073f5;
+            background-color: rgba(0, 115, 245, 0.1);
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tab-btn:hover, .tab-btn.active {
+            background-color: #0d0d19;
+            color: #0073f5;
+        }
+        
+        .tab-btn.disabled {
+            color: #4b5563;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .tab-btn.disabled:hover {
+            background-color: transparent;
+            color: #4b5563;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0073f5, #5d15f5);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 0;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #0073f5, #5d15f5);
+        }
+        
+        .timeline-item:last-child::before {
+            height: 0;
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        .canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(13, 13, 25, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .animate-delay-100 { animation-delay: 0.1s; }
+        .animate-delay-200 { animation-delay: 0.2s; }
+        .animate-delay-300 { animation-delay: 0.3s; }
+        .animate-delay-400 { animation-delay: 0.4s; }
+        .animate-delay-500 { animation-delay: 0.5s; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .desktop-nav {
+                display: flex;
+            }
+            
+            .mobile-nav {
+                display: none;
+            }
+        }
+        
+        /* Wallet modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: #0d0d19;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .wallet-option:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .wallet-option img {
+            width: 40px;
+            height: 40px;
+            margin-right: 1rem;
+        }
+        
+        /* Steps */
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 25%;
+        }
+        
+        .step-item::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+        }
+        
+        .step-item:first-child::before {
+            display: none;
+        }
+        
+        .step-item:last-child::before {
+            display: none;
+        }
+        
+        .step-item .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step-item.active .step-number {
+            background: linear-gradient(90deg, #0073f5, #5d15f5);
+        }
+        
+        .step-item.completed .step-number {
+            background-color: #00ff9d;
+            color: #080814;
+        }
+        
+        /* Pages */
+        .page {
+            display: none;
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Token card */
+        .token-card {
+            border-radius: 0.5rem;
+            background-color: #0d0d19;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .token-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 115, 245, 0.15);
+            border-color: rgba(0, 115, 245, 0.3);
+        }
+        
+        .token-card .token-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .token-card .token-info {
+            flex: 1;
+        }
+        
+        .token-card .token-name {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .token-card .token-symbol {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+        }
+        
+        .token-card .token-price {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .token-card .token-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .token-card .token-change.positive {
+            color: #00ff9d;
+        }
+        
+        .token-card .token-change.negative {
+            color: #ff4d4f;
+        }
+        
+        /* Proposal card */
+        .proposal-card {
+            border-radius: 0.5rem;
+            background-color: #0d0d19;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        /* Simplified and Modern Styles */
+        .card {
+            background: rgba(13, 13, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: rgba(0, 115, 245, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #0073f5, #5d15f5);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 115, 245, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            border-color: #0073f5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 115, 245, 0.2);
+        }
+        
+        .network-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .network-btn.active {
+            background: linear-gradient(90deg, #0073f5, #5d15f5);
+            border-color: transparent;
+        }
+        
+        .network-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-btn.active {
+            color: white;
+            border-bottom-color: #0073f5;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Proposal Card Styles */
+        .proposal-card {
+            background: rgba(13, 13, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .proposal-card:hover {
+            border-color: rgba(0, 115, 245, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .proposal-card .proposal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .proposal-card .proposal-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .proposal-card .proposal-status.active {
+            background-color: rgba(0, 115, 245, 0.2);
+            color: #0073f5;
+        }
+        
+        .proposal-card .proposal-status.passed {
+            background-color: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+        }
+        
+        .proposal-card .proposal-status.rejected {
+            background-color: rgba(255, 77, 79, 0.2);
+            color: #ff4d4f;
+        }
+        
+        .proposal-card .proposal-votes {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .proposal-card .proposal-vote {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .proposal-card .proposal-vote-count {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .proposal-card .proposal-vote-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body class="dark">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-dark-500 bg-opacity-90 backdrop-blur-md border-b border-gray-800 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center" onclick="showPage('home-page')">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mr-3">
+                            <i class="fas fa-balance-scale text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">unifa.launch</span>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors" onclick="showPage('home-page')">Home</a>
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors" onclick="showPage('projects-page')">Projects</a>
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors" onclick="showPage('create-token-page')">Create Token</a>
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors" onclick="showPage('dao-page')">DAO</a>
+                    <div id="wallet-connect-button">
+                        <button class="btn-primary" onclick="openWalletModal()">Connect Wallet</button>
+                    </div>
+                    <div id="wallet-connected" class="hidden items-center">
+                        <div class="bg-dark-400 rounded-full px-4 py-2 flex items-center cursor-pointer hover:bg-dark-300 transition-colors" onclick="toggleWalletDropdown()">
+                            <div id="connected-address" class="text-sm font-medium mr-2">0x...</div>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                        <div id="wallet-dropdown" class="hidden absolute mt-2 bg-dark-400 rounded-lg shadow-lg py-2 w-48 z-10">
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-dark-300 transition-colors" onclick="copyAddress()">Copy Address</a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-dark-300 transition-colors" onclick="showNetwork()">Network</a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-dark-300 transition-colors" onclick="disconnectWallet()">Disconnect</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Navigation Toggle -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div id="mobile-menu" class="md:hidden hidden bg-dark-400 mt-3 rounded-lg shadow-lg overflow-hidden">
+                <div class="flex flex-col">
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors py-3 px-4 border-b border-gray-800" onclick="showPage('home-page'); toggleMobileMenu()">Home</a>
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors py-3 px-4 border-b border-gray-800" onclick="showPage('projects-page'); toggleMobileMenu()">Projects</a>
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors py-3 px-4 border-b border-gray-800" onclick="showPage('create-token-page'); toggleMobileMenu()">Create Token</a>
+                    <a href="#" class="text-white hover:text-primary-500 transition-colors py-3 px-4 border-b border-gray-800" onclick="showPage('dao-page'); toggleMobileMenu()">DAO</a>
+                    <div id="mobile-wallet-connect-button" class="p-4">
+                        <button class="btn-primary w-full" onclick="openWalletModal(); toggleMobileMenu()">Connect Wallet</button>
+                    </div>
+                    <div id="mobile-wallet-connected" class="hidden p-4">
+                        <div class="bg-dark-500 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-sm font-medium">Connected</div>
+                                <div id="mobile-connected-address" class="text-sm font-medium">0x...</div>
+                            </div>
+                            <div class="flex justify-between">
+                                <button class="text-primary-500 text-sm" onclick="copyAddress(); toggleMobileMenu()">Copy Address</button>
+                                <button class="text-danger-500 text-sm" onclick="disconnectWallet(); toggleMobileMenu()">Disconnect</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Wallet Modal -->
+    <div id="wallet-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Connect Wallet</h3>
+                <button onclick="closeWalletModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="wallet-modal-content">
+                <div class="p-4">
+                    <div class="space-y-3">
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('metamask')">
+                            <img src="https://logo.svgcdn.com/l/metamask-icon.svg" alt="MetaMask" class="w-6 h-6 mr-3">
+                            <div>
+                                <div class="font-medium">MetaMask</div>
+                                <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('trust-wallet')">
+                            <i class="fas fa-shield-alt text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium">Trust Wallet</div>
+                                <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('coinbase')">
+                            <img src="https://static.cdnlogo.com/logos/c/12/coinbase.png" alt="Coinbase Wallet" class="w-6 h-6 mr-3">
+                            <div>
+                                <div class="font-medium">Coinbase Wallet</div>
+                                <div class="text-xs text-gray-400">Connect using Coinbase Wallet app</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('wallet-connect')">
+                            <i class="fas fa-qrcode text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium">WalletConnect</div>
+                                <div class="text-xs text-gray-400">Connect using QR code with any wallet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Home Page -->
+    <div id="home-page" class="page active">
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center px-4 pt-20 overflow-hidden">
+            <div class="canvas-container absolute inset-0 z-0">
+                <canvas id="hero-canvas"></canvas>
+            </div>
+            <div class="container mx-auto max-w-7xl relative z-10">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                        Fair Token Launches for<br>
+                        <span class="gradient-text">Everyone</span>
+                    </h1>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+                        unifa.launch is a decentralized platform that enables fair, transparent, and community-governed token launches. Our innovative mechanism ensures equal opportunities for all participants while protecting against rug pulls.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                        <button class="btn-primary text-lg px-8 py-6" onclick="showPage('create-token-page')">
+                            <i class="fas fa-rocket mr-2"></i> Launch Token
+                        </button>
+                        <button class="btn-secondary text-lg px-8 py-6" onclick="showPage('projects-page')">
+                            <i class="fas fa-compass mr-2"></i> Explore Projects
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-16">
+                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/074c4ff2a349430f938187670a8f143f~tplv-a9rns2rl98-image.image?rcl=20251107002831C6B413012975D24FAD63&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1765038584&x-signature=uI28HBlBxatvzYCO%2B8%2BwjDRYtFI%3D" alt="Fair Token Launch" class="rounded-lg shadow-2xl max-w-full h-auto mx-auto">
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="py-20 px-6 bg-dark-400">
+            <div class="container mx-auto max-w-7xl">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Why Choose unifa.launch?</h2>
+                    <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                        Our platform combines the simplicity of Pump.fun with advanced features that ensure fairness, transparency, and community governance.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="card p-8 rounded-xl animate-fadeIn">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mb-6 shadow-lg shadow-primary-500/20">
+                            <i class="fas fa-balance-scale text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Fair Launch Mechanism</h3>
+                        <p class="text-gray-300">
+                            No pre-sales, no team allocations. Every participant gets equal access at the same price through our transparent bonding curve.
+                        </p>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="card p-8 rounded-xl animate-fadeIn animate-delay-200">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mb-6 shadow-lg shadow-primary-500/20">
+                            <i class="fas fa-shield-alt text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Anti-Rug Pull Protection</h3>
+                        <p class="text-gray-300">
+                            40% of funds go to liquidity pool, 60% to development fund controlled by smart contract and released based on milestones.
+                        </p>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="card p-8 rounded-xl animate-fadeIn animate-delay-400">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mb-6 shadow-lg shadow-primary-500/20">
+                            <i class="fas fa-code-branch text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Development Progress Tracking</h3>
+                        <p class="text-gray-300">
+                            Public milestones and progress tracking ensure transparency and accountability from project teams.
+                        </p>
+                    </div>
+                    
+                    <!-- Feature 4 -->
+                    <div class="card p-8 rounded-xl animate-fadeIn">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mb-6 shadow-lg shadow-primary-500/20">
+                            <i class="fas fa-users-cog text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">DAO Governance</h3>
+                        <p class="text-gray-300">
+                            Community-driven decision making through our DAO governance system. Token holders vote on key proposals and project direction.
+                        </p>
+                    </div>
+                    
+                    <!-- Feature 5 -->
+                    <div class="card p-8 rounded-xl animate-fadeIn animate-delay-200">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mb-6 shadow-lg shadow-primary-500/20">
+                            <i class="fas fa-chart-pie text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Transparent Fund Allocation</h3>
+                        <p class="text-gray-300">
+                            Real-time visualization of fund distribution between liquidity pool and development fund.
+                        </p>
+                    </div>
+                    
+                    <!-- Feature 6 -->
+                    <div class="card p-8 rounded-xl animate-fadeIn animate-delay-400">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mb-6 shadow-lg shadow-primary-500/20">
+                            <i class="fas fa-code text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">No-Code Token Creation</h3>
+                        <p class="text-gray-300">
+                            Launch your token in minutes with our intuitive interface. No coding skills required.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- How It Works Section -->
+        <section class="py-20 px-6">
+            <div class="container mx-auto max-w-7xl">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+                    <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                        Launching a token on unifa.launch is simple and straightforward. Here's how it works:
+                    </p>
+                </div>
+                
+                <div class="relative">
+                    <!-- Timeline Line -->
+                    <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary-500 to-secondary-500 transform -translate-x-1/2"></div>
+                    
+                    <!-- Step 1 -->
+                    <div class="flex flex-col md:flex-row items-center mb-16">
+                        <div class="md:w-1/2 md:pr-12 md:text-right mb-8 md:mb-0">
+                            <h3 class="text-xl font-bold mb-4">Create Your Token</h3>
+                            <p class="text-gray-300">
+                                Fill in basic information about your token, including name, symbol, description, and logo. No coding required.
+                            </p>
+                        </div>
+                        <div class="md:w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center z-10">
+                            <span class="font-bold text-white">1</span>
+                        </div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/9378837b7f3f46b2a769c832dc0cea7e~tplv-a9rns2rl98-image.image?rcl=202511071052277983B1CB960A8796FA7E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1765075986&x-signature=utEkmx0KN9pjx0tp3ibzzcBGJdU%3D" alt="Create Token" class="rounded-lg shadow-lg max-w-full h-auto">
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="flex flex-col md:flex-row-reverse items-center mb-16">
+                        <div class="md:w-1/2 md:pl-12 md:text-left mb-8 md:mb-0">
+                            <h3 class="text-xl font-bold mb-4">Set Parameters</h3>
+                            <p class="text-gray-300">
+                                Configure your token's parameters, including launch type, price, date, liquidity ratio, and funding goal.
+                            </p>
+                        </div>
+                        <div class="md:w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center z-10">
+                            <span class="font-bold text-white">2</span>
+                        </div>
+                        <div class="md:w-1/2 md:pr-12">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/5126fd07505c42aeb483b7e8e116cf2c~tplv-a9rns2rl98-image.image?rcl=202511071052277983B1CB960A8796FA7E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1765076005&x-signature=dyThoxY8kttReGVocOq5MteRsfo%3D" alt="Set Parameters" class="rounded-lg shadow-lg max-w-full h-auto">
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="flex flex-col md:flex-row items-center mb-16">
+                        <div class="md:w-1/2 md:pr-12 md:text-right mb-8 md:mb-0">
+                            <h3 class="text-xl font-bold mb-4">Define Milestones</h3>
+                            <p class="text-gray-300">
+                                Set development milestones and funding release triggers. This ensures transparency and accountability.
+                            </p>
+                        </div>
+                        <div class="md:w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center z-10">
+                            <span class="font-bold text-white">3</span>
+                        </div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/51459492afe34ffc8470f418f2c18a22~tplv-a9rns2rl98-image.image?rcl=20251107002831C6B413012975D24FAD63&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1765038586&x-signature=PklcJCP%2FecqswE4XKaOqYwOj%2F4M%3D" alt="Define Milestones" class="rounded-lg shadow-lg max-w-full h-auto">
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="flex flex-col md:flex-row-reverse items-center">
+                        <div class="md:w-1/2 md:pl-12 md:text-left mb-8 md:mb-0">
+                            <h3 class="text-xl font-bold mb-4">Launch and Govern</h3>
+                            <p class="text-gray-300">
+                                Launch your token and let the community participate. Use our DAO governance system to make key decisions.
+                            </p>
+                        </div>
+                        <div class="md:w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center z-10">
+                            <span class="font-bold text-white">4</span>
+                        </div>
+                        <div class="md:w-1/2 md:pr-12">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/452a15049fb84d18a8bc5e6a2b5d4853~tplv-a9rns2rl98-image.image?rcl=202511071052277983B1CB960A8796FA7E&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1765076024&x-signature=umhpJ9JfZOg91zFiofWQFfHMhG8%3D" alt="Launch and Govern" class="rounded-lg shadow-lg max-w-full h-auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Fund Allocation Section -->
+        <section class="py-20 px-6 bg-dark-400">
+            <div class="container mx-auto max-w-7xl">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Transparent Fund Allocation</h2>
+                    <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                        Our smart contract automatically distributes funds between liquidity pool and development fund, ensuring transparency and security.
+                    </p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 mb-10 md:mb-0">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/b972223634f14d29a042b16c776ec125~tplv-a9rns2rl98-image.image?rcl=20251107002831C6B413012975D24FAD63&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1765038585&x-signature=sGaL%2Fa7BYKDQWNodWhjLtQl%2FHj8%3D" alt="Fund Allocation" class="rounded-lg shadow-2xl max-w-full h-auto">
+                    </div>
+                    <div class="md:w-1/2 md:pl-12">
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4">40% Liquidity Pool</h3>
+                            <p class="text-gray-300 mb-4">
+                                Immediately added to the liquidity pool to ensure price stability and prevent manipulation.
+                            </p>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-bold mb-4">60% Development Fund</h3>
+                            <p class="text-gray-300 mb-4">
+                                Controlled by smart contract and released based on predefined milestones and community approval.
+                            </p>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 p-6 bg-dark-500 rounded-lg">
+                            <h4 class="font-bold mb-2">Smart Contract Control</h4>
+                            <p class="text-gray-300">
+                                Development funds are held in a smart contract and only released when specific milestones are achieved and approved by the community.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Stats Section -->
+        <section class="py-20 px-6">
+            <div class="container mx-auto max-w-7xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Stat 1 -->
+                    <div class="card p-8 text-center animate-fadeIn">
+                        <div class="text-4xl font-bold gradient-text mb-2" id="stats-projects">0</div>
+                        <p class="text-gray-300">Projects Launched</p>
+                    </div>
+                    
+                    <!-- Stat 2 -->
+                    <div class="card p-8 text-center animate-fadeIn animate-delay-200">
+                        <div class="text-4xl font-bold gradient-text mb-2" id="stats-volume">$0</div>
+                        <p class="text-gray-300">Total Trading Volume</p>
+                    </div>
+                    
+                    <!-- Stat 3 -->
+                    <div class="card p-8 text-center animate-fadeIn animate-delay-300">
+                        <div class="text-4xl font-bold gradient-text mb-2" id="stats-users">0</div>
+                        <p class="text-gray-300">Active Users</p>
+                    </div>
+                    
+                    <!-- Stat 4 -->
+                    <div class="card p-8 text-center animate-fadeIn animate-delay-400">
+                        <div class="text-4xl font-bold gradient-text mb-2" id="stats-funds">$0</div>
+                        <p class="text-gray-300">Funds Secured</p>
+                    </div>
+                </div>
+                <div class="mt-12 text-center text-gray-400 text-sm">
+                    <p>Platform is currently in development. Stats will be updated once the platform is live.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="py-20 px-6 bg-gradient-to-r from-primary-500 to-secondary-500">
+            <div class="container mx-auto max-w-7xl text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Launch Your Token?</h2>
+                <p class="text-lg mb-8 max-w-3xl mx-auto">
+                    Join the fair token revolution. Launch your project with transparency, security, and community support.
+                </p>
+                <button class="bg-white text-primary-500 hover:bg-gray-100 transition-colors font-bold py-3 px-8 rounded-lg text-lg" onclick="showPage('create-token-page')">
+                    <i class="fas fa-rocket mr-2"></i> Launch Your Token
+                </button>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Projects Page -->
+    <div id="projects-page" class="page">
+        <div class="container mx-auto max-w-7xl px-6">
+            <div class="mb-10">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">Explore Projects</h1>
+                <p class="text-gray-300">
+                    unifa.launch is currently in development. Our token launch platform will be available soon. Check back later to discover exciting new projects.
+                </p>
+            </div>
+            
+            <!-- Coming Soon Card -->
+            <div class="card p-8 mb-10 text-center">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-rocket text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-4">Launch Platform Coming Soon</h2>
+                <p class="text-gray-300 max-w-2xl mx-auto mb-8">
+                    We're putting the finishing touches on our fair token launch platform. Be the first to launch your project or discover new opportunities by joining our waitlist.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button class="btn-primary" onclick="alert('Thank you for your interest! We will notify you when the platform is ready.')">
+                        <i class="fas fa-paper-plane mr-2"></i> Join Waitlist
+                    </button>
+                    <button class="btn-secondary" onclick="showPage('create-token-page')">
+                        <i class="fas fa-lightbulb mr-2"></i> Prepare Your Project
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Example Project -->
+            <div class="mb-10">
+                <h2 class="text-xl font-bold mb-6">Example Project</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Example Project 1 -->
+                    <div class="token-card p-6 cursor-pointer border border-dashed border-gray-700" onclick="showProjectDetails('project-1')">
+                        <div class="flex items-center mb-4">
+                            <div class="token-icon">
+                                <i class="fas fa-robot text-primary-500 text-xl"></i>
+                            </div>
+                            <div class="token-info">
+                                <div class="flex items-center">
+                                    <div class="token-name">AI Protocol</div>
+                                    <span class="ml-2 px-2 py-0.5 bg-primary-500 bg-opacity-20 text-primary-500 text-xs rounded-full">Example</span>
+                                </div>
+                                <div class="token-symbol">AIP</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-sm mb-4">
+                            Decentralized AI platform that connects AI models with blockchain applications. This is an example of how projects will appear on our platform.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="token-price">$0.05</div>
+                                <div class="token-change positive">
+                                    <i class="fas fa-arrow-up mr-1"></i> 24.5%
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm">Market Cap</div>
+                                <div class="font-medium">$5.2M</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Project 2 -->
+                    <div class="token-card p-6 cursor-pointer border border-dashed border-gray-700" onclick="showProjectDetails('project-2')">
+                        <div class="flex items-center mb-4">
+                            <div class="token-icon">
+                                <i class="fas fa-gamepad text-secondary-500 text-xl"></i>
+                            </div>
+                            <div class="token-info">
+                                <div class="flex items-center">
+                                    <div class="token-name">GameVerse</div>
+                                    <span class="ml-2 px-2 py-0.5 bg-primary-500 bg-opacity-20 text-primary-500 text-xs rounded-full">Example</span>
+                                </div>
+                                <div class="token-symbol">GV</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-sm mb-4">
+                            Metaverse gaming platform with play-to-earn mechanics and cross-game assets. This is an example of how projects will appear on our platform.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="token-price">$0.25</div>
+                                <div class="token-change positive">
+                                    <i class="fas fa-arrow-up mr-1"></i> 12.3%
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm">Market Cap</div>
+                                <div class="font-medium">$25.6M</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 text-center text-gray-400 text-sm">
+                    * These are example projects to demonstrate the platform functionality.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Project Details Page -->
+    <div id="project-details-page" class="page">
+        <div class="container mx-auto max-w-7xl px-6">
+            <button class="flex items-center text-primary-500 mb-8" onclick="showPage('projects-page')">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Projects
+            </button>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column -->
+                <div class="lg:col-span-2">
+                    <!-- Project Header -->
+                    <div class="card p-6 mb-8">
+                        <div class="flex flex-col md:flex-row items-start md:items-center mb-6">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mr-0 md:mr-6 mb-4 md:mb-0">
+                                <i class="fas fa-robot text-white text-3xl"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center">
+                                    <h1 class="text-3xl font-bold">AI Protocol</h1>
+                                    <span class="ml-3 px-3 py-1 bg-primary-500 bg-opacity-20 text-primary-500 text-sm rounded-full">New</span>
+                                </div>
+                                <div class="text-gray-400">AIP</div>
+                                <div class="flex items-center mt-2">
+                                    <div class="text-2xl font-bold mr-4">$0.05</div>
+                                    <div class="text-success-500 flex items-center">
+                                        <i class="fas fa-arrow-up mr-1"></i> 24.5%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-auto mt-4 md:mt-0">
+                                <button class="btn-primary">
+                                    <i class="fas fa-exchange-alt mr-2"></i> Trade
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <div class="text-gray-400 text-sm">Market Cap</div>
+                                <div class="font-medium">$5.2M</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-sm">24h Volume</div>
+                                <div class="font-medium">$1.2M</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-sm">Total Supply</div>
+                                <div class="font-medium">100M AIP</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-sm">Circulating Supply</div>
+                                <div class="font-medium">50M AIP</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Chart -->
+                    <div class="card p-6 mb-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold">Price Chart</h2>
+                            <div class="flex space-x-2">
+                                <button class="network-btn active">24h</button>
+                                <button class="network-btn">7d</button>
+                                <button class="network-btn">1m</button>
+                                <button class="network-btn">All</button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="price-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Description -->
+                    <div class="card p-6 mb-8">
+                        <h2 class="text-xl font-bold mb-4">About AI Protocol</h2>
+                        <p class="text-gray-300 mb-4">
+                            AI Protocol is a decentralized platform that connects AI models with blockchain applications. Our mission is to democratize access to AI technology and create a fair ecosystem where AI developers and users can interact directly.
+                        </p>
+                        <p class="text-gray-300 mb-4">
+                            The AIP token is used to access AI services on the platform, reward AI model developers, and participate in governance. Our fair launch mechanism ensures that everyone has equal opportunity to participate in the growth of the ecosystem.
+                        </p>
+                        <div class="flex flex-wrap gap-4 mt-6">
+                            <a href="https://x.com/unifalaunch" target="_blank" class="flex items-center text-primary-500 hover:underline">
+                                <i class="fab fa-twitter mr-2"></i> Twitter
+                            </a>
+                            <a href="#" class="flex items-center text-primary-500 hover:underline">
+                                <i class="fab fa-telegram-plane mr-2"></i> Telegram
+                            </a>
+                            <a href="#" class="flex items-center text-primary-500 hover:underline">
+                                <i class="fab fa-discord mr-2"></i> Discord
+                            </a>
+                            <a href="#" class="flex items-center text-primary-500 hover:underline">
+                                <i class="fab fa-github mr-2"></i> GitHub
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Development Progress -->
+                    <div class="card p-6 mb-8">
+                        <h2 class="text-xl font-bold mb-6">Development Progress</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Milestone 1 -->
+                            <div class="timeline-item">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="font-bold">Prototype Development</h3>
+                                    <span class="text-success-500">Completed</span>
+                                </div>
+                                <p class="text-gray-300 text-sm mb-2">
+                                    Develop initial prototype of the AI Protocol platform with basic functionality.
+                                </p>
+                                <div class="flex justify-between text-xs text-gray-400">
+                                    <span>Funding: $500K</span>
+                                    <span>Completed: Oct 15, 2025</span>
+                                </div>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-bar-fill" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Milestone 2 -->
+                            <div class="timeline-item">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="font-bold">Beta Launch</h3>
+                                    <span class="text-primary-500">In Progress</span>
+                                </div>
+                                <p class="text-gray-300 text-sm mb-2">
+                                    Launch beta version of the platform with limited AI models and features.
+                                </p>
+                                <div class="flex justify-between text-xs text-gray-400">
+                                    <span>Funding: $500K</span>
+                                    <span>Target: Dec 1, 2025</span>
+                                </div>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-bar-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Milestone 3 -->
+                            <div class="timeline-item">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="font-bold">Full Launch</h3>
+                                    <span class="text-gray-400">Pending</span>
+                                </div>
+                                <p class="text-gray-300 text-sm mb-2">
+                                    Launch full version of the platform with complete feature set and AI model marketplace.
+                                </p>
+                                <div class="flex justify-between text-xs text-gray-400">
+                                    <span>Funding: $1M</span>
+                                    <span>Target: Feb 1, 2026</span>
+                                </div>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-bar-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Milestone 4 -->
+                            <div class="timeline-item">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="font-bold">DAO Implementation</h3>
+                                    <span class="text-gray-400">Pending</span>
+                                </div>
+                                <p class="text-gray-300 text-sm mb-2">
+                                    Implement full DAO governance system for platform decisions and treasury management.
+                                </p>
+                                <div class="flex justify-between text-xs text-gray-400">
+                                    <span>Funding: $1.5M</span>
+                                    <span>Target: Mar 15, 2026</span>
+                                </div>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-bar-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="lg:col-span-1">
+                    <!-- Buy Token -->
+                    <div class="card p-6 mb-8">
+                        <h2 class="text-xl font-bold mb-6">Buy AIP</h2>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-400 text-sm mb-2">Amount (USD)</label>
+                            <input type="text" class="input-field" placeholder="0.00" value="100">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-gray-400 text-sm mb-2">You'll Get</label>
+                            <div class="input-field bg-dark-500" readonly>2000 AIP</div>
+                        </div>
+                        
+                        <button class="btn-primary w-full">
+                            <i class="fas fa-shopping-cart mr-2"></i> Buy AIP
+                        </button>
+                        
+                        <div class="mt-4 text-center text-sm text-gray-400">
+                            Price: $0.05 per AIP
+                        </div>
+                    </div>
+                    
+                    <!-- Fund Allocation -->
+                    <div class="card p-6 mb-8">
+                        <h2 class="text-xl font-bold mb-6">Fund Allocation</h2>
+                        
+                        <div class="mb-6">
+                            <canvas id="fund-allocation-chart"></canvas>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Liquidity Pool</span>
+                                    <span>40%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span>Development Fund</span>
+                                    <span>60%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-dark-500 rounded-lg">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                                <h4 class="font-bold">Smart Contract Controlled</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">
+                                Development funds are held in a smart contract and only released when milestones are achieved and approved by the community.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Team -->
+                    <div class="card p-6">
+                        <h2 class="text-xl font-bold mb-6">Team</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Team Member 1 -->
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mr-4">
+                                    <span class="font-bold">JD</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium">John Doe</div>
+                                    <div class="text-gray-400 text-sm">Founder & CEO</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Team Member 2 -->
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mr-4">
+                                    <span class="font-bold">AS</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium">Alice Smith</div>
+                                    <div class="text-gray-400 text-sm">CTO</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Team Member 3 -->
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mr-4">
+                                    <span class="font-bold">MB</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium">Mike Brown</div>
+                                    <div class="text-gray-400 text-sm">Lead AI Researcher</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Token Page -->
+    <div id="create-token-page" class="page">
+        <div class="container mx-auto max-w-7xl px-6">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Create Your Token</h1>
+            <p class="text-gray-300 mb-8">
+                Launch your token in minutes with our intuitive, no-code interface. Follow the steps below to get started.
+            </p>
+            
+            <!-- Steps Indicator -->
+            <div class="step-indicator mb-10">
+                <div class="step-item active">
+                    <div class="step-number">1</div>
+                    <div class="text-sm">Token Info</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="text-sm">Network</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="text-sm">Launch</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="text-sm">Milestones</div>
+                </div>
+            </div>
+            
+            <!-- Step 1: Token Info -->
+            <div id="step-1" class="step active">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Token Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Token Name</label>
+                            <input type="text" class="input-field" placeholder="e.g. AI Protocol">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Token Symbol</label>
+                            <input type="text" class="input-field" placeholder="e.g. AIP" maxlength="5">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-400 text-sm mb-2">Description</label>
+                            <textarea class="input-field" rows="4" placeholder="Describe your project and token utility..."></textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-400 text-sm mb-2">Token Logo</label>
+                            <div class="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center cursor-pointer hover:border-primary-500 transition-colors">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-500 mb-4"></i>
+                                <div class="text-gray-400">Click to upload or drag and drop</div>
+                                <div class="text-xs text-gray-500 mt-2">PNG, JPG, GIF (max 1MB)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button class="btn-primary" onclick="nextStep(1)">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Network -->
+            <div id="step-2" class="step">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Network Selection</h2>
+                    
+                    <div class="mb-8">
+                        <label class="block text-gray-400 text-sm mb-4">Choose Network</label>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                            <div class="network-btn active flex flex-col items-center">
+                                <i class="fab fa-ethereum text-2xl mb-2"></i>
+                                <div class="font-medium">Ethereum</div>
+                                <div class="text-xs text-gray-400">Gas fees: ~$20-50</div>
+                            </div>
+                            
+                            <div class="network-btn flex flex-col items-center">
+                                <i class="fab fa-btc text-2xl mb-2"></i>
+                                <div class="font-medium">BSC</div>
+                                <div class="text-xs text-gray-400">Gas fees: ~$0.5-1</div>
+                            </div>
+                            
+                            <div class="network-btn flex flex-col items-center">
+                                <i class="fas fa-cubes text-2xl mb-2"></i>
+                                <div class="font-medium">Polygon</div>
+                                <div class="text-xs text-gray-400">Gas fees: ~$0.1-0.5</div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 bg-dark-500 rounded-lg">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                                <h4 class="font-bold">Network Considerations</h4>
+                            </div>
+                            <p class="text-gray-300 text-sm">
+                                Different networks have different gas fees and user bases. Ethereum has the largest ecosystem but higher fees, while BSC and Polygon offer lower fees with growing adoption.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button class="btn-secondary" onclick="prevStep(2)">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        
+                        <button class="btn-primary" onclick="nextStep(2)">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Launch -->
+            <div id="step-3" class="step">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Launch Configuration</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Launch Type</label>
+                            <select class="input-field">
+                                <option>Bonding Curve</option>
+                                <option>Fixed Price</option>
+                                <option>Auction</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Starting Price</label>
+                            <div class="relative">
+                                <input type="text" class="input-field pl-8" placeholder="0.00" value="0.01">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    $
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Launch Date</label>
+                            <input type="date" class="input-field">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Total Supply</label>
+                            <input type="text" class="input-field" placeholder="0" value="100000000">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Liquidity Ratio</label>
+                            <div class="relative">
+                                <input type="text" class="input-field pl-8" placeholder="0" value="40">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    %
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Funding Goal</label>
+                            <div class="relative">
+                                <input type="text" class="input-field pl-8" placeholder="0" value="100000">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    $
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-dark-500 rounded-lg mb-8">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                            <h4 class="font-bold">Fair Launch Mechanism</h4>
+                        </div>
+                        <p class="text-gray-300 text-sm">
+                            Our bonding curve ensures that everyone can buy at a fair price that increases with demand. 40% of funds go to liquidity pool, 60% to development fund controlled by smart contract.
+                        </p>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button class="btn-secondary" onclick="prevStep(3)">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        
+                        <button class="btn-primary" onclick="nextStep(3)">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Milestones -->
+            <div id="step-4" class="step">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Development Milestones</h2>
+                    
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-medium">Milestones</h3>
+                            <button class="text-primary-500 hover:underline flex items-center" onclick="addMilestone()">
+                                <i class="fas fa-plus mr-1"></i> Add Milestone
+                            </button>
+                        </div>
+                        
+                        <div id="milestones-container">
+                            <!-- Milestone 1 -->
+                            <div class="milestone-item p-6 bg-dark-500 rounded-lg mb-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-medium">Milestone 1</h4>
+                                    <button class="text-gray-400 hover:text-white" onclick="removeMilestone(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Title</label>
+                                        <input type="text" class="input-field" placeholder="e.g. Prototype Development" value="Prototype Development">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Funding</label>
+                                        <div class="relative">
+                                            <input type="text" class="input-field pl-8" placeholder="0" value="500000">
+                                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                                $
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Deadline</label>
+                                        <input type="date" class="input-field" value="2025-12-01">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Completion Criteria</label>
+                                        <select class="input-field">
+                                            <option>Community Vote</option>
+                                            <option>Team Confirmation</option>
+                                            <option>Smart Contract Verification</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-400 text-sm mb-2">Description</label>
+                                        <textarea class="input-field" rows="3" placeholder="Describe what will be delivered...">Develop initial prototype of the platform with basic functionality and conduct internal testing.</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Milestone 2 -->
+                            <div class="milestone-item p-6 bg-dark-500 rounded-lg mb-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-medium">Milestone 2</h4>
+                                    <button class="text-gray-400 hover:text-white" onclick="removeMilestone(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Title</label>
+                                        <input type="text" class="input-field" placeholder="e.g. Beta Launch" value="Beta Launch">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Funding</label>
+                                        <div class="relative">
+                                            <input type="text" class="input-field pl-8" placeholder="0" value="500000">
+                                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                                $
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Deadline</label>
+                                        <input type="date" class="input-field" value="2026-02-01">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-400 text-sm mb-2">Completion Criteria</label>
+                                        <select class="input-field">
+                                            <option>Community Vote</option>
+                                            <option selected>Team Confirmation</option>
+                                            <option>Smart Contract Verification</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-400 text-sm mb-2">Description</label>
+                                        <textarea class="input-field" rows="3" placeholder="Describe what will be delivered...">Launch beta version of the platform with limited features and onboard initial users for testing and feedback.</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-dark-500 rounded-lg mb-8">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                            <h4 class="font-bold">Milestone Funding</h4>
+                        </div>
+                        <p class="text-gray-300 text-sm">
+                            Development funds are released only when milestones are completed and approved. This ensures transparency and accountability to token holders.
+                        </p>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button class="btn-secondary" onclick="prevStep(4)">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        
+                        <button class="btn-primary" onclick="deployToken()">
+                            Deploy Token <i class="fas fa-rocket ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Deployment Success -->
+            <div id="deployment-success" class="step hidden">
+                <div class="card p-8 text-center">
+                    <div class="w-20 h-20 rounded-full bg-primary-500 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-info-circle text-white text-3xl"></i>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold mb-4">Token Creation Simulation</h2>
+                    <p class="text-gray-300 mb-8">
+                        This is a simulation of the token creation process. In the live platform, your token would be deployed to the selected blockchain network.
+                    </p>
+                    
+                    <div class="max-w-md mx-auto p-6 bg-dark-500 rounded-lg mb-8">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-400">Token Name</span>
+                            <span class="font-medium">AI Protocol</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-400">Token Symbol</span>
+                            <span class="font-medium">AIP</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-400">Contract Address</span>
+                            <span class="font-medium text-primary-500">Simulation Only</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Launch Date</span>
+                            <span class="font-medium">Coming Soon</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="btn-primary" onclick="alert('Token creation is simulated in this demo. The actual deployment feature will be available when the platform is live.')">
+                            <i class="fas fa-info-circle mr-2"></i> Learn More
+                        </button>
+                        <button class="btn-secondary" onclick="resetTokenCreator()">
+                            <i class="fas fa-redo mr-2"></i> Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- DAO Page -->
+    <div id="dao-page" class="page">
+        <div class="container mx-auto max-w-7xl px-6">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">DAO Governance</h1>
+            <p class="text-gray-300 mb-8">
+                Participate in the governance of the unifa.launch ecosystem. Vote on proposals, submit your own, and help shape the future of the platform.
+            </p>
+            
+            <!-- Governance Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div class="card p-6">
+                    <div class="text-gray-400 text-sm mb-2">Total Proposals</div>
+                    <div class="text-3xl font-bold">0</div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="text-gray-400 text-sm mb-2">Active Proposals</div>
+                    <div class="text-3xl font-bold">0</div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="text-gray-400 text-sm mb-2">Voting Participants</div>
+                    <div class="text-3xl font-bold">0</div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="text-gray-400 text-sm mb-2">Treasury Balance</div>
+                    <div class="text-3xl font-bold">$0</div>
+                </div>
+            </div>
+            <div class="mt-6 text-center text-gray-400 text-sm">
+                <p>DAO functionality is currently in development. It will be available once the platform is live.</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-800 mb-8">
+                <button class="tab-btn active" onclick="showDAOSection('proposals')">Proposals</button>
+                <button class="tab-btn disabled" onclick="alert('This feature is coming soon!')">Create Proposal</button>
+                <button class="tab-btn disabled" onclick="alert('This feature is coming soon!')">Voting Power</button>
+                <button class="tab-btn disabled" onclick="alert('This feature is coming soon!')">Treasury</button>
+            </div>
+            
+            <!-- Proposals Section -->
+            <div id="proposals-section" class="dao-section">
+                <!-- No Proposals Message -->
+                <div class="card p-8 text-center">
+                    <div class="w-20 h-20 rounded-full bg-dark-500 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-file-alt text-gray-500 text-3xl"></i>
+                    </div>
+                    
+                    <h2 class="text-xl font-bold mb-4">No Proposals Yet</h2>
+                    <p class="text-gray-300 mb-8 max-w-2xl mx-auto">
+                        There are currently no proposals in the system. DAO functionality will be available once the platform is live and the community is established.
+                    </p>
+                    
+                    <button class="btn-secondary" onclick="alert('DAO functionality is coming soon!')">
+                        <i class="fas fa-info-circle mr-2"></i> Learn More
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Create Proposal Section -->
+            <div id="create-proposal-section" class="dao-section hidden">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Create New Proposal</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-400 text-sm mb-2">Title</label>
+                            <input type="text" class="input-field" placeholder="Enter proposal title...">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-400 text-sm mb-2">Description</label>
+                            <textarea class="input-field" rows="6" placeholder="Describe your proposal in detail..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Proposal Type</label>
+                            <select class="input-field">
+                                <option>Protocol Improvement</option>
+                                <option>Treasury Allocation</option>
+                                <option>Parameter Change</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Voting Duration</label>
+                            <select class="input-field">
+                                <option>3 days</option>
+                                <option>7 days</option>
+                                <option>14 days</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Treasury Request (Optional)</label>
+                            <div class="relative">
+                                <input type="text" class="input-field pl-8" placeholder="0.00">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    $
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Quorum Requirement</label>
+                            <select class="input-field">
+                                <option>25%</option>
+                                <option selected>33%</option>
+                                <option>50%</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-dark-500 rounded-lg mb-8">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                            <h4 class="font-bold">Proposal Guidelines</h4>
+                        </div>
+                        <p class="text-gray-300 text-sm">
+                            Please ensure your proposal is clear, concise, and addresses a specific issue or improvement. Proposals that are vague or do not align with the platform's goals may be rejected by the community.
+                        </p>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button class="btn-primary">Submit Proposal</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Voting Power Section -->
+            <div id="voting-power-section" class="dao-section hidden">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Your Voting Power</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <div class="text-gray-400 text-sm mb-2">Total Voting Power</div>
+                            <div class="text-3xl font-bold">12,500 VP</div>
+                            <div class="text-sm text-gray-400 mt-1">Based on your token holdings and lock-up period</div>
+                        </div>
+                        
+                        <div>
+                            <div class="text-gray-400 text-sm mb-2">Locked Tokens</div>
+                            <div class="text-3xl font-bold">10,000 402</div>
+                            <div class="text-sm text-gray-400 mt-1">Locked until Dec 31, 2025</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-bold mb-4">Voting Power Breakdown</h3>
+                        <div class="h-60">
+                            <canvas id="voting-power-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-dark-500 rounded-lg mb-8">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                            <h4 class="font-bold">Voting Power Calculation</h4>
+                        </div>
+                        <p class="text-gray-300 text-sm">
+                            Voting power is calculated based on the number of tokens you hold and the duration they are locked. Locking tokens for longer periods increases your voting power.
+                        </p>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button class="btn-secondary">
+                            <i class="fas fa-lock mr-2"></i> Lock Tokens
+                        </button>
+                        
+                        <button class="btn-primary">
+                            <i class="fas fa-history mr-2"></i> Voting History
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Treasury Section -->
+            <div id="treasury-section" class="dao-section hidden">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Treasury Overview</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <div class="text-gray-400 text-sm mb-2">Total Balance</div>
+                            <div class="text-2xl font-bold">$4.2M</div>
+                        </div>
+                        
+                        <div>
+                            <div class="text-gray-400 text-sm mb-2">Available for Proposals</div>
+                            <div class="text-2xl font-bold">$2.8M</div>
+                        </div>
+                        
+                        <div>
+                            <div class="text-gray-400 text-sm mb-2">Allocated to Projects</div>
+                            <div class="text-2xl font-bold">$1.4M</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-bold mb-4">Treasury Allocation</h3>
+                        <div class="h-60">
+                            <canvas id="treasury-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-bold mb-4">Recent Treasury Transactions</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Transaction 1 -->
+                            <div class="flex justify-between items-center p-4 bg-dark-500 rounded-lg">
+                                <div>
+                                    <div class="font-medium">Polygon Integration</div>
+                                    <div class="text-sm text-gray-400">Funding for Polygon network integration</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium text-success-500">+$500K</div>
+                                    <div class="text-sm text-gray-400">2 days ago</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Transaction 2 -->
+                            <div class="flex justify-between items-center p-4 bg-dark-500 rounded-lg">
+                                <div>
+                                    <div class="font-medium">Security Audit</div>
+                                    <div class="text-sm text-gray-400">Funding for third-party security audit</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium text-danger-500">-$150K</div>
+                                    <div class="text-sm text-gray-400">1 week ago</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Transaction 3 -->
+                            <div class="flex justify-between items-center p-4 bg-dark-500 rounded-lg">
+                                <div>
+                                    <div class="font-medium">Marketing Campaign</div>
+                                    <div class="text-sm text-gray-400">Funding for platform marketing campaign</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium text-danger-500">-$300K</div>
+                                    <div class="text-sm text-gray-400">2 weeks ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button class="btn-primary">
+                            <i class="fas fa-file-alt mr-2"></i> View Full Treasury Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-dark-400 py-12 px-6">
+        <div class="container mx-auto max-w-7xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center mr-3 shadow-lg shadow-primary-500/20">
+                            <i class="fas fa-balance-scale text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">unifa.launch</span>
+                    </div>
+                    <p class="text-gray-300 mb-6">
+                        Fair, transparent, and community-governed token launches for everyone.
+                    </p>
+                    <div class="flex space-x-6 mt-2">
+                        <a href="https://x.com/unifalaunch" target="_blank" class="text-gray-400 hover:text-primary-500 transition-all duration-300 transform hover:scale-125 flex items-center">
+                            <i class="fab fa-twitter mr-2"></i>
+                            <span>Twitter</span>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary-500 transition-all duration-300 transform hover:scale-125 flex items-center">
+                            <i class="fab fa-telegram-plane mr-2"></i>
+                            <span>Telegram</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-6">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors" onclick="showPage('home-page')">Home</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors" onclick="showPage('projects-page')">Projects</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors" onclick="showPage('create-token-page')">Create Token</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors" onclick="showPage('dao-page')">DAO</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-6">Resources</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors">FAQ</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors">Guides</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors">Smart Contracts</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-primary-500 transition-colors">Security</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-6">Subscribe</h3>
+                    <p class="text-gray-300 mb-4">
+                        Stay updated with the latest news and developments.
+                    </p>
+                    <div class="flex">
+                        <input type="email" class="input-field rounded-l-lg" placeholder="Your email">
+                        <button class="bg-gradient-to-r from-primary-500 to-secondary-500 px-4 rounded-r-lg hover:shadow-lg hover:shadow-primary-500/20 transition-all">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gray-400 mb-4 md:mb-0">
+                    &copy; 2025 unifa.launch. All rights reserved.
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-primary-500 transition-colors">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-primary-500 transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-primary-500 transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Web3 Wallet Integration
+        let web3Provider;
+        let currentAccount;
+        let currentChainId;
+        let walletConnectProvider;
+        let coinbaseWalletProvider;
+        
+        // Wallet configurations
+        const SUPPORTED_CHAINS = {
+            1: {
+                name: "Ethereum Mainnet",
+                symbol: "ETH",
+                rpcUrl: "https://mainnet.infura.io/v3/your-infura-key"
+            },
+            5: {
+                name: "Goerli Testnet",
+                symbol: "ETH",
+                rpcUrl: "https://goerli.infura.io/v3/your-infura-key"
+            },
+            56: {
+                name: "Binance Smart Chain",
+                symbol: "BNB",
+                rpcUrl: "https://bsc-dataseed.binance.org/"
+            },
+            137: {
+                name: "Polygon Mainnet",
+                symbol: "MATIC",
+                rpcUrl: "https://polygon-rpc.com/"
+            }
+        };
+        
+        const DEFAULT_CHAIN_ID = 5; // Goerli Testnet
+        
+        // Initialize Web3 provider
+        async function initWeb3() {
+            // Check if user has any wallet installed
+            if (window.ethereum) {
+                try {
+                    // Request account access
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                    setupWalletEvents();
+                    updateAccountInfo();
+                } catch (error) {
+                    console.error("User denied account access", error);
+                }
+            }
+        }
+        
+        // Setup wallet events
+        function setupWalletEvents() {
+            if (!window.ethereum) return;
+            
+            // Account change event
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    currentAccount = accounts[0];
+                    updateAccountInfo();
+                } else {
+                    disconnectWallet();
+                }
+            });
+            
+            // Chain change event
+            window.ethereum.on('chainChanged', (chainId) => {
+                currentChainId = parseInt(chainId);
+                updateChainInfo();
+            });
+            
+            // Disconnect event
+            window.ethereum.on('disconnect', (error) => {
+                console.error("Wallet disconnected", error);
+                disconnectWallet();
+            });
+        }
+        
+        // Update account information
+        async function updateAccountInfo() {
+            if (!web3Provider) return;
+            
+            try {
+                const accounts = await web3Provider.listAccounts();
+                if (accounts.length > 0) {
+                    currentAccount = accounts[0];
+                    currentChainId = await web3Provider.getNetwork().then(network => network.chainId);
+                    
+                    // Update UI
+                    document.getElementById('connected-address').textContent = formatAddress(currentAccount);
+                    document.getElementById('mobile-connected-address').textContent = formatAddress(currentAccount);
+                    
+                    document.getElementById('wallet-connect-button').classList.add('hidden');
+                    document.getElementById('wallet-connected').classList.remove('hidden');
+                    document.getElementById('wallet-connected').classList.add('flex');
+                    
+                    document.getElementById('mobile-wallet-connect-button').classList.add('hidden');
+                    document.getElementById('mobile-wallet-connected').classList.remove('hidden');
+                    
+                    // Show success message
+                    showNotification(`Connected to ${formatAddress(currentAccount)}`);
+                }
+            } catch (error) {
+                console.error("Error updating account info", error);
+            }
+        }
+        
+        // Update chain information
+        function updateChainInfo() {
+            const chainInfo = SUPPORTED_CHAINS[currentChainId] || {
+                name: "Unknown Network",
+                symbol: "?",
+                rpcUrl: ""
+            };
+            
+            // Show notification
+            showNotification(`Switched to ${chainInfo.name}`);
+        }
+        
+        // Connect to specific wallet
+        async function connectWallet(walletType) {
+            closeWalletModal();
+            
+            try {
+                switch (walletType) {
+                    case 'metamask':
+                        await connectMetaMask();
+                        break;
+                    case 'trust-wallet':
+                        await connectTrustWallet();
+                        break;
+                    case 'coinbase':
+                        await connectCoinbaseWallet();
+                        break;
+                    case 'wallet-connect':
+                        await connectWalletConnect();
+                        break;
+                    default:
+                        throw new Error(`Unsupported wallet type: ${walletType}`);
+                }
+            } catch (error) {
+                console.error(`Error connecting to ${walletType}`, error);
+                showNotification(`Failed to connect to wallet: ${error.message}`, 'error');
+            }
+        }
+        
+        // Connect to MetaMask
+        async function connectMetaMask() {
+            if (!window.ethereum) {
+                throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
+            }
+            
+            // Check if it's actually MetaMask
+            if (window.ethereum.isMetaMask) {
+                web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                await web3Provider.send("eth_requestAccounts", []);
+                setupWalletEvents();
+                updateAccountInfo();
+            } else {
+                throw new Error("Please use MetaMask wallet");
+            }
+        }
+        
+        // Connect to Trust Wallet
+        async function connectTrustWallet() {
+            // Trust Wallet injects itself as window.ethereum with isTrustWallet flag
+            if (!window.ethereum) {
+                throw new Error("Trust Wallet is not installed. Please install it from https://trustwallet.com/");
+            }
+            
+            // Check if it's Trust Wallet
+            if (window.ethereum.isTrustWallet) {
+                web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                await web3Provider.send("eth_requestAccounts", []);
+                setupWalletEvents();
+                updateAccountInfo();
+            } else {
+                // Try to open Trust Wallet app on mobile
+                if (window.location.protocol === 'https:') {
+                    window.open('https://link.trustwallet.com/open_url?coin_id=60&url=' + encodeURIComponent(window.location.href));
+                } else {
+                    throw new Error("Trust Wallet requires HTTPS connection");
+                }
+            }
+        }
+        
+        // Connect to Coinbase Wallet
+        async function connectCoinbaseWallet() {
+            // Check if Coinbase Wallet SDK is available
+            if (typeof CoinbaseWalletSDK === 'undefined') {
+                throw new Error("Coinbase Wallet SDK not loaded");
+            }
+            
+            // Initialize Coinbase Wallet SDK
+            const coinbaseWalletSdk = new CoinbaseWalletSDK({
+                appName: "unifa.launch",
+                appLogoUrl: "https://your-app-logo-url.com",
+                darkMode: true
+            });
+            
+            // Make Web3 provider
+            coinbaseWalletProvider = coinbaseWalletSdk.makeWeb3Provider(
+                SUPPORTED_CHAINS[DEFAULT_CHAIN_ID].rpcUrl,
+                DEFAULT_CHAIN_ID
+            );
+            
+            // Request accounts
+            await coinbaseWalletProvider.enable();
+            
+            // Set as current provider
+            web3Provider = new ethers.providers.Web3Provider(coinbaseWalletProvider);
+            setupWalletEvents();
+            updateAccountInfo();
+        }
+        
+        // Connect to WalletConnect
+        async function connectWalletConnect() {
+            // Check if WalletConnect is available
+            if (typeof WalletConnect === 'undefined') {
+                throw new Error("WalletConnect not loaded");
+            }
+            
+            // Create WalletConnect provider
+            walletConnectProvider = new WalletConnect({
+                bridge: "https://bridge.walletconnect.org",
+                qrcodeModal: QRCodeModal
+            });
+            
+            // Check if connection is already established
+            if (!walletConnectProvider.connected) {
+                // Create session
+                await walletConnectProvider.createSession({
+                    chainId: DEFAULT_CHAIN_ID,
+                    rpc: {
+                        [DEFAULT_CHAIN_ID]: SUPPORTED_CHAINS[DEFAULT_CHAIN_ID].rpcUrl
+                    }
+                });
+            }
+            
+            // Set up event listeners
+            walletConnectProvider.on("connect", (error, payload) => {
+                if (error) {
+                    throw error;
+                }
+                
+                // Get accounts and chainId
+                const { accounts, chainId } = payload.params[0];
+                currentAccount = accounts[0];
+                currentChainId = chainId;
+                
+                // Set as current provider
+                web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
+                updateAccountInfo();
+            });
+            
+            walletConnectProvider.on("session_update", (error, payload) => {
+                if (error) {
+                    throw error;
+                }
+                
+                // Get updated accounts and chainId
+                const { accounts, chainId } = payload.params[0];
+                currentAccount = accounts[0];
+                currentChainId = chainId;
+                
+                updateAccountInfo();
+            });
+            
+            walletConnectProvider.on("disconnect", (error, payload) => {
+                console.log("WalletConnect disconnected", error, payload);
+                disconnectWallet();
+            });
+        }
+        
+        // Disconnect wallet
+        function disconnectWallet() {
+            if (walletConnectProvider && walletConnectProvider.connected) {
+                walletConnectProvider.killSession();
+            }
+            
+            if (coinbaseWalletProvider && coinbaseWalletProvider.disconnect) {
+                coinbaseWalletProvider.disconnect();
+            }
+            
+            web3Provider = null;
+            currentAccount = null;
+            currentChainId = null;
+            
+            // Update UI
+            document.getElementById('wallet-connect-button').classList.remove('hidden');
+            document.getElementById('wallet-connected').classList.add('hidden');
+            document.getElementById('wallet-connected').classList.remove('flex');
+            document.getElementById('wallet-dropdown').classList.add('hidden');
+            
+            document.getElementById('mobile-wallet-connect-button').classList.remove('hidden');
+            document.getElementById('mobile-wallet-connected').classList.add('hidden');
+            
+            // Show notification
+            showNotification("Wallet disconnected");
+        }
+        
+        // Switch network
+        async function switchNetwork(chainId) {
+            if (!window.ethereum) {
+                throw new Error("No wallet provider available");
+            }
+            
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: `0x${chainId.toString(16)}` }]
+                });
+            } catch (error) {
+                // This error code indicates that the chain has not been added to MetaMask
+                if (error.code === 4902) {
+                    const chainInfo = SUPPORTED_CHAINS[chainId];
+                    if (chainInfo) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: `0x${chainId.toString(16)}`,
+                                chainName: chainInfo.name,
+                                nativeCurrency: {
+                                    name: chainInfo.name,
+                                    symbol: chainInfo.symbol,
+                                    decimals: 18
+                                },
+                                rpcUrls: [chainInfo.rpcUrl],
+                                blockExplorerUrls: [chainInfo.blockExplorerUrl || '']
+                            }]
+                        });
+                    }
+                } else {
+                    throw error;
+                }
+            }
+        }
+        
+        // Show network selection
+        function showNetwork() {
+            const chainId = currentChainId || DEFAULT_CHAIN_ID;
+            const currentChain = SUPPORTED_CHAINS[chainId] || { name: "Unknown Network" };
+            
+            let html = `<div class="p-4">
+                <h3 class="font-bold mb-4">Select Network</h3>
+                <p class="text-sm text-gray-400 mb-4">Current: ${currentChain.name}</p>
+                <div class="space-y-2">`;
+            
+            for (const [id, chain] of Object.entries(SUPPORTED_CHAINS)) {
+                html += `<div class="p-2 bg-dark-500 rounded cursor-pointer hover:bg-dark-300 transition-colors" onclick="switchNetwork(${id}); closeWalletModal()">
+                    <div class="font-medium">${chain.name}</div>
+                    <div class="text-xs text-gray-400">${chain.symbol}</div>
+                </div>`;
+            }
+            
+            html += `</div></div>`;
+            
+            // Show in modal
+            document.getElementById('wallet-modal-content').innerHTML = html;
+            document.getElementById('wallet-modal').style.display = 'flex';
+        }
+        
+        // Copy address to clipboard
+        function copyAddress() {
+            if (!currentAccount) return;
+            
+            navigator.clipboard.writeText(currentAccount)
+                .then(() => {
+                    showNotification("Address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy address: ", err);
+                    showNotification("Failed to copy address", "error");
+                });
+        }
+        
+        // Toggle wallet dropdown
+        function toggleWalletDropdown() {
+            const dropdown = document.getElementById('wallet-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+        
+        // Format address for display
+        function formatAddress(address) {
+            if (!address) return "0x...";
+            return address.substring(0, 6) + "..." + address.substring(address.length - 4);
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300 ${
+                type === 'success' ? 'bg-success-500' : 'bg-danger-500'
+            }`;
+            notification.textContent = message;
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Fade in
+            setTimeout(() => {
+                notification.classList.add('opacity-90');
+            }, 10);
+            
+            // Fade out and remove
+            setTimeout(() => {
+                notification.classList.remove('opacity-90');
+                notification.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Initialize Three.js scene
+        function initThreeScene() {
+            const canvas = document.getElementById('hero-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                alpha: true,
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 5;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.005,
+                color: 0x0073f5,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            camera.position.z = 2;
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.y += 0.001;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        // Initialize charts
+        function initCharts() {
+            // Price Chart
+            const priceCtx = document.getElementById('price-chart');
+            if(priceCtx) {
+                new Chart(priceCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '00:00'],
+                        datasets: [{
+                            label: 'Price ($)',
+                            data: [0.03, 0.035, 0.042, 0.038, 0.045, 0.048, 0.05],
+                            borderColor: '#0073f5',
+                            backgroundColor: 'rgba(0, 115, 245, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#0073f5',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(13, 13, 25, 0.9)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                borderWidth: 1,
+                                padding: 10,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Price: $${context.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.5)'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    callback: function(value) {
+                                        return `$${value}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Fund Allocation Chart
+            const fundAllocationCtx = document.getElementById('fund-allocation-chart');
+            if(fundAllocationCtx) {
+                new Chart(fundAllocationCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Liquidity Pool', 'Development Fund'],
+                        datasets: [{
+                            data: [40, 60],
+                            backgroundColor: [
+                                '#0073f5',
+                                '#5d15f5'
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#fff',
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Voting Power Chart
+            const votingPowerCtx = document.getElementById('voting-power-chart');
+            if(votingPowerCtx) {
+                new Chart(votingPowerCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Locked Tokens', 'Staked Tokens', 'Delegated Voting'],
+                        datasets: [{
+                            label: 'Voting Power',
+                            data: [8000, 3000, 1500],
+                            backgroundColor: [
+                                '#0073f5',
+                                '#5d15f5',
+                                '#00c3ff'
+                            ],
+                            borderWidth: 0,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.7)'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.5)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Treasury Chart
+            const treasuryCtx = document.getElementById('treasury-chart');
+            if(treasuryCtx) {
+                new Chart(treasuryCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Protocol Development', 'Marketing', 'Security', 'Community Grants', 'Reserved'],
+                        datasets: [{
+                            data: [40, 25, 15, 10, 10],
+                            backgroundColor: [
+                                '#0073f5',
+                                '#5d15f5',
+                                '#00c3ff',
+                                '#00ff9d',
+                                '#ffaa00'
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#fff',
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Animate stats
+        function animateStats() {
+            const stats = {
+                projects: {
+                    element: document.getElementById('stats-projects'),
+                    target: 125
+                },
+                volume: {
+                    element: document.getElementById('stats-volume'),
+                    target: 50
+                },
+                users: {
+                    element: document.getElementById('stats-users'),
+                    target: 25000
+                },
+                funds: {
+                    element: document.getElementById('stats-funds'),
+                    target: 12
+                }
+            };
+            
+            const duration = 2000; // 2 seconds
+            const frameRate = 60;
+            const totalFrames = duration / (1000 / frameRate);
+            
+            let frame = 0;
+            
+            function updateStats() {
+                if(frame >= totalFrames) return;
+                
+                for(const key in stats) {
+                    const stat = stats[key];
+                    if(!stat.element) continue;
+                    
+                    const progress = frame / totalFrames;
+                    const current = Math.floor(stat.target * progress);
+                    
+                    if(key === 'volume' || key === 'funds') {
+                        stat.element.textContent = `$${current}M`;
+                    } else if(key === 'users') {
+                        stat.element.textContent = current.toLocaleString();
+                    } else {
+                        stat.element.textContent = current;
+                    }
+                }
+                
+                frame++;
+                requestAnimationFrame(updateStats);
+            }
+            
+            updateStats();
+        }
+        
+        // Page navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update URL
+            window.history.pushState({}, '', `#${pageId}`);
+        }
+        
+        // Show project details
+        function showProjectDetails(projectId) {
+            showPage('project-details-page');
+            // Here you would typically load project-specific data
+            console.log(`Showing details for project: ${projectId}`);
+        }
+        
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        // Wallet modal
+        function openWalletModal() {
+            // Reset modal content
+            const modalContent = document.getElementById('wallet-modal-content');
+            modalContent.innerHTML = `
+                <div class="p-4">
+                    <h3 class="font-bold mb-4">Connect Wallet</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('metamask')">
+                            <img src="https://logo.svgcdn.com/l/metamask-icon.svg" alt="MetaMask" class="w-6 h-6 mr-3">
+                            <div>
+                                <div class="font-medium">MetaMask</div>
+                                <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('trust-wallet')">
+                            <i class="fas fa-shield-alt text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium">Trust Wallet</div>
+                                <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('coinbase')">
+                            <img src="https://static.cdnlogo.com/logos/c/12/coinbase.png" alt="Coinbase Wallet" class="w-6 h-6 mr-3">
+                            <div>
+                                <div class="font-medium">Coinbase Wallet</div>
+                                <div class="text-xs text-gray-400">Connect using Coinbase Wallet app</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('wallet-connect')">
+                            <i class="fas fa-qrcode text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium">WalletConnect</div>
+                                <div class="text-xs text-gray-400">Connect using QR code with any wallet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('wallet-modal').style.display = 'flex';
+        }
+        
+        function closeWalletModal() {
+            document.getElementById('wallet-modal').style.display = 'none';
+        }
+        
+
+        
+        // Token creator steps
+        function nextStep(currentStep) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${currentStep + 1}`).classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step-item')[currentStep].classList.add('active');
+            document.querySelectorAll('.step-item')[currentStep - 1].classList.add('completed');
+        }
+        
+        function prevStep(currentStep) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${currentStep - 1}`).classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step-item')[currentStep - 1].classList.remove('active');
+        }
+        
+        // Add milestone
+        function addMilestone() {
+            const milestonesContainer = document.getElementById('milestones-container');
+            const milestoneCount = milestonesContainer.children.length + 1;
+            
+            const milestoneHTML = `
+                <div class="milestone-item p-6 bg-dark-500 rounded-lg mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-medium">Milestone ${milestoneCount}</h4>
+                        <button class="text-gray-400 hover:text-white" onclick="removeMilestone(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Title</label>
+                            <input type="text" class="input-field" placeholder="e.g. Prototype Development">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Funding</label>
+                            <div class="relative">
+                                <input type="text" class="input-field pl-8" placeholder="0">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    $
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Deadline</label>
+                            <input type="date" class="input-field">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Completion Criteria</label>
+                            <select class="input-field">
+                                <option>Community Vote</option>
+                                <option>Team Confirmation</option>
+                                <option>Smart Contract Verification</option>
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-400 text-sm mb-2">Description</label>
+                            <textarea class="input-field" rows="3" placeholder="Describe what will be delivered..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            milestonesContainer.insertAdjacentHTML('beforeend', milestoneHTML);
+        }
+        
+        // Remove milestone
+        function removeMilestone(element) {
+            const milestoneItem = element.closest('.milestone-item');
+            milestoneItem.remove();
+            
+            // Reorder milestones
+            const milestones = document.querySelectorAll('.milestone-item');
+            milestones.forEach((milestone, index) => {
+                milestone.querySelector('h4').textContent = `Milestone ${index + 1}`;
+            });
+        }
+        
+        // Deploy token
+        function deployToken() {
+            document.getElementById('step-4').classList.remove('active');
+            document.getElementById('deployment-success').classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step-item')[3].classList.add('completed');
+        }
+        
+        // Reset token creator
+        function resetTokenCreator() {
+            document.getElementById('deployment-success').classList.remove('active');
+            document.getElementById('step-1').classList.add('active');
+            
+            // Reset step indicator
+            document.querySelectorAll('.step-item').forEach((item, index) => {
+                if(index === 0) {
+                    item.classList.add('active');
+                    item.classList.remove('completed');
+                } else {
+                    item.classList.remove('active');
+                    item.classList.remove('completed');
+                }
+            });
+        }
+        
+        // DAO sections
+        function showDAOSection(sectionId) {
+            document.querySelectorAll('.dao-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            document.getElementById(`${sectionId}-section`).classList.remove('hidden');
+            
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Three.js scene
+            if(document.getElementById('hero-canvas')) {
+                initThreeScene();
+            }
+            
+            // Initialize charts
+            initCharts();
+            
+            // Animate stats
+            animateStats();
+            
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
+            
+            // Close wallet modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('wallet-modal');
+                if(event.target === modal) {
+                    closeWalletModal();
+                }
+            });
+            
+            // Handle URL hash
+            const hash = window.location.hash.substring(1);
+            if(hash && document.getElementById(hash)) {
+                showPage(hash);
+            } else {
+                showPage('home-page');
+            }
+        });
+    </script>
+</body>
+</html>
