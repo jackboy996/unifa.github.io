@@ -12,12 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Web3.js -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@4.1.1/dist/web3.min.js"></script>
-    <!-- Ethers.js -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist/ethers.umd.min.js"></script>
-    <!-- Coinbase Wallet SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@3.8.0/dist/coinbase-wallet-sdk.min.js"></script>
+    <!-- Solana web3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.50.1/lib/index.iife.min.js"></script>
     <!-- WalletConnect -->
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/client@1.8.0/dist/umd/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/qrcode-modal@1.8.0/dist/umd/index.min.js"></script>
@@ -770,21 +766,35 @@
                 <div class="p-4">
                     <div class="space-y-3">
                         <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('metamask')">
-                            <img src="https://logo.svgcdn.com/l/metamask-icon.svg" alt="MetaMask" class="w-6 h-6 mr-3">
+                            <i class="fas fa-user-circle text-xl mr-3"></i>
                             <div>
                                 <div class="font-medium">MetaMask</div>
                                 <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
                             </div>
                         </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('phantom')">
+                            <i class="fas fa-user-circle text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium">Phantom</div>
+                                <div class="text-xs text-gray-400">Connect using Phantom wallet (Solana)</div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('solflare')">
+                            <i class="fas fa-user-circle text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium">Solflare</div>
+                                <div class="text-xs text-gray-400">Connect using Solflare wallet (Solana)</div>
+                            </div>
+                        </div>
                         <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('trust-wallet')">
-                            <i class="fas fa-shield-alt text-xl mr-3"></i>
+                            <i class="fas fa-user-circle text-xl mr-3"></i>
                             <div>
                                 <div class="font-medium">Trust Wallet</div>
                                 <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
                             </div>
                         </div>
                         <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('coinbase')">
-                            <img src="https://static.cdnlogo.com/logos/c/12/coinbase.png" alt="Coinbase Wallet" class="w-6 h-6 mr-3">
+                            <i class="fas fa-user-circle text-xl mr-3"></i>
                             <div>
                                 <div class="font-medium">Coinbase Wallet</div>
                                 <div class="text-xs text-gray-400">Connect using Coinbase Wallet app</div>
@@ -1495,15 +1505,15 @@
                 </div>
                 <div class="step-item">
                     <div class="step-number">2</div>
-                    <div class="text-sm">Network</div>
-                </div>
-                <div class="step-item">
-                    <div class="step-number">3</div>
                     <div class="text-sm">Launch</div>
                 </div>
                 <div class="step-item">
-                    <div class="step-number">4</div>
+                    <div class="step-number">3</div>
                     <div class="text-sm">Milestones</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="text-sm">Confirm</div>
                 </div>
             </div>
             
@@ -1546,60 +1556,16 @@
                 </div>
             </div>
             
-            <!-- Step 2: Network -->
+            <!-- Step 2: Launch -->
             <div id="step-2" class="step">
                 <div class="card p-8">
-                    <h2 class="text-xl font-bold mb-6">Network Selection</h2>
-                    
-                    <div class="mb-8">
-                        <label class="block text-gray-400 text-sm mb-4">Choose Network</label>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            <div class="network-btn active flex flex-col items-center">
-                                <i class="fab fa-ethereum text-2xl mb-2"></i>
-                                <div class="font-medium">Ethereum</div>
-                                <div class="text-xs text-gray-400">Gas fees: ~$20-50</div>
-                            </div>
-                            
-                            <div class="network-btn flex flex-col items-center">
-                                <i class="fab fa-btc text-2xl mb-2"></i>
-                                <div class="font-medium">BSC</div>
-                                <div class="text-xs text-gray-400">Gas fees: ~$0.5-1</div>
-                            </div>
-                            
-                            <div class="network-btn flex flex-col items-center">
-                                <i class="fas fa-cubes text-2xl mb-2"></i>
-                                <div class="font-medium">Polygon</div>
-                                <div class="text-xs text-gray-400">Gas fees: ~$0.1-0.5</div>
-                            </div>
+                    <div class="flex items-center mb-6">
+                        <div class="bg-primary-500 bg-opacity-20 text-primary-500 px-3 py-1 rounded-full text-sm font-medium mr-3">
+                            <i class="fas fa-circle text-blue-400 mr-1"></i> Solana Network
                         </div>
-                        
-                        <div class="p-6 bg-dark-500 rounded-lg">
-                            <div class="flex items-center mb-2">
-                                <i class="fas fa-info-circle text-primary-500 mr-2"></i>
-                                <h4 class="font-bold">Network Considerations</h4>
-                            </div>
-                            <p class="text-gray-300 text-sm">
-                                Different networks have different gas fees and user bases. Ethereum has the largest ecosystem but higher fees, while BSC and Polygon offer lower fees with growing adoption.
-                            </p>
-                        </div>
+                        <div class="text-sm text-gray-400">Gas fees: ~$0.00025</div>
                     </div>
                     
-                    <div class="flex justify-between">
-                        <button class="btn-secondary" onclick="prevStep(2)">
-                            <i class="fas fa-arrow-left mr-2"></i> Back
-                        </button>
-                        
-                        <button class="btn-primary" onclick="nextStep(2)">
-                            Next <i class="fas fa-arrow-right ml-2"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Step 3: Launch -->
-            <div id="step-3" class="step">
-                <div class="card p-8">
                     <h2 class="text-xl font-bold mb-6">Launch Configuration</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -1664,19 +1630,19 @@
                     </div>
                     
                     <div class="flex justify-between">
-                        <button class="btn-secondary" onclick="prevStep(3)">
+                        <button class="btn-secondary" onclick="prevStep(2)">
                             <i class="fas fa-arrow-left mr-2"></i> Back
                         </button>
                         
-                        <button class="btn-primary" onclick="nextStep(3)">
+                        <button class="btn-primary" onclick="nextStep(2)">
                             Next <i class="fas fa-arrow-right ml-2"></i>
                         </button>
                     </div>
                 </div>
             </div>
             
-            <!-- Step 4: Milestones -->
-            <div id="step-4" class="step">
+            <!-- Step 3: Milestones -->
+            <div id="step-3" class="step">
                 <div class="card p-8">
                     <h2 class="text-xl font-bold mb-6">Development Milestones</h2>
                     
@@ -1791,6 +1757,87 @@
                         <p class="text-gray-300 text-sm">
                             Development funds are released only when milestones are completed and approved. This ensures transparency and accountability to token holders.
                         </p>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button class="btn-secondary" onclick="prevStep(3)">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        
+                        <button class="btn-primary" onclick="nextStep(3)">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Confirm -->
+            <div id="step-4" class="step">
+                <div class="card p-8">
+                    <h2 class="text-xl font-bold mb-6">Confirm Token Details</h2>
+                    
+                    <div class="bg-dark-500 rounded-lg p-6 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Token Name</div>
+                                <div class="font-medium">AI Protocol</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Token Symbol</div>
+                                <div class="font-medium">AIP</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Network</div>
+                                <div class="font-medium flex items-center">
+                                    <i class="fas fa-circle text-blue-400 mr-2"></i>
+                                    Solana Mainnet Beta
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Total Supply</div>
+                                <div class="font-medium">100,000,000 AIP</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Launch Type</div>
+                                <div class="font-medium">Bonding Curve</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Starting Price</div>
+                                <div class="font-medium">$0.01</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Liquidity Ratio</div>
+                                <div class="font-medium">40%</div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-gray-400 text-sm mb-1">Development Fund</div>
+                                <div class="font-medium">60%</div>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <div class="text-gray-400 text-sm mb-1">Milestones</div>
+                                <div class="font-medium">2 milestones created</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-warning-500 bg-opacity-10 border border-warning-500 border-opacity-30 rounded-lg mb-8">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-warning-500 mr-3 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-warning-500 mb-2">Important</h4>
+                                <p class="text-gray-300 text-sm">
+                                    Please review all details carefully. Once deployed, your token and launch parameters cannot be changed. You will need to connect your Solana wallet to deploy the token.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="flex justify-between">
@@ -2186,144 +2233,69 @@
     </footer>
     
     <script>
-        // Web3 Wallet Integration
-        let web3Provider;
-        let currentAccount;
-        let currentChainId;
-        let walletConnectProvider;
-        let coinbaseWalletProvider;
+        // Solana Wallet Integration
+        let solanaConnection;
+        let solanaProvider;
+        let solanaPublicKey;
         
         // Wallet configurations
-        const SUPPORTED_CHAINS = {
-            1: {
-                name: "Ethereum Mainnet",
-                symbol: "ETH",
-                rpcUrl: "https://mainnet.infura.io/v3/your-infura-key"
+        const SUPPORTED_SOLANA_NETWORKS = {
+            mainnet: {
+                name: "Solana Mainnet Beta",
+                symbol: "SOL",
+                rpcUrl: "https://api.mainnet-beta.solana.com"
             },
-            5: {
-                name: "Goerli Testnet",
-                symbol: "ETH",
-                rpcUrl: "https://goerli.infura.io/v3/your-infura-key"
+            devnet: {
+                name: "Solana Devnet",
+                symbol: "SOL",
+                rpcUrl: "https://api.devnet.solana.com"
             },
-            56: {
-                name: "Binance Smart Chain",
-                symbol: "BNB",
-                rpcUrl: "https://bsc-dataseed.binance.org/"
-            },
-            137: {
-                name: "Polygon Mainnet",
-                symbol: "MATIC",
-                rpcUrl: "https://polygon-rpc.com/"
+            testnet: {
+                name: "Solana Testnet",
+                symbol: "SOL",
+                rpcUrl: "https://api.testnet.solana.com"
             }
         };
         
-        const DEFAULT_CHAIN_ID = 5; // Goerli Testnet
+        const DEFAULT_SOLANA_NETWORK = "devnet";
         
-        // Initialize Web3 provider
-        function initWeb3() {
-            // Check if ethers is loaded
-            if (typeof ethers === 'undefined') {
-                console.error('ethers.js library is not loaded');
-                showNotification('Failed to load required wallet libraries', 'error');
+        // Initialize Solana provider
+        function initSolana() {
+            console.log("Initializing Solana...");
+            
+            // Check if Solana web3.js is loaded
+            if (typeof solanaWeb3 === 'undefined') {
+                console.error('Solana web3.js library is not loaded');
+                showNotification('Failed to load required Solana libraries', 'error');
                 return;
             }
             
-            // Check if user has any wallet installed
-            if (window.ethereum) {
-                try {
-                    // Setup provider but don't request accounts automatically
-                    web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-                    setupWalletEvents();
-                } catch (error) {
-                    console.error("Failed to initialize provider", error);
-                }
+            // Check if user has any Solana wallet installed
+            if (window.phantom?.solana || window.solflare) {
+                console.log("Solana wallet detected");
             } else {
-                showNotification('No wallet detected. Please install MetaMask or another wallet.', 'error');
+                console.log("No Solana wallet detected");
+                showNotification('No Solana wallet detected. Please install Phantom or another Solana wallet.', 'info');
             }
         }
         
-        // Setup wallet events
-        function setupWalletEvents() {
-            if (!window.ethereum) return;
-            
-            // Account change event
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length > 0) {
-                    currentAccount = accounts[0];
-                    updateAccountInfo();
-                } else {
-                    disconnectWallet();
-                }
-            });
-            
-            // Chain change event
-            window.ethereum.on('chainChanged', (chainId) => {
-                currentChainId = parseInt(chainId);
-                updateChainInfo();
-            });
-            
-            // Disconnect event
-            window.ethereum.on('disconnect', (error) => {
-                console.error("Wallet disconnected", error);
-                disconnectWallet();
-            });
-        }
         
-        // Update account information
-        async function updateAccountInfo() {
-            if (!web3Provider) return;
-            
-            try {
-                const accounts = await web3Provider.listAccounts();
-                if (accounts.length > 0) {
-                    currentAccount = accounts[0];
-                    currentChainId = await web3Provider.getNetwork().then(network => network.chainId);
-                    
-                    // Update UI
-                    document.getElementById('connected-address').textContent = formatAddress(currentAccount);
-                    document.getElementById('mobile-connected-address').textContent = formatAddress(currentAccount);
-                    
-                    document.getElementById('wallet-connect-button').classList.add('hidden');
-                    document.getElementById('wallet-connected').classList.remove('hidden');
-                    document.getElementById('wallet-connected').classList.add('flex');
-                    
-                    document.getElementById('mobile-wallet-connect-button').classList.add('hidden');
-                    document.getElementById('mobile-wallet-connected').classList.remove('hidden');
-                    
-                    // Show success message
-                    showNotification(`Connected to ${formatAddress(currentAccount)}`);
-                }
-            } catch (error) {
-                console.error("Error updating account info", error);
-            }
-        }
-        
-        // Update chain information
-        function updateChainInfo() {
-            const chainInfo = SUPPORTED_CHAINS[currentChainId] || {
-                name: "Unknown Network",
-                symbol: "?",
-                rpcUrl: ""
-            };
-            
-            // Show notification
-            showNotification(`Switched to ${chainInfo.name}`);
-        }
         
         // Connect to specific wallet
         async function connectWallet(walletType) {
             closeWalletModal();
             
-            // Check if ethers is loaded
-            if (typeof ethers === 'undefined') {
-                showNotification('Wallet libraries not loaded. Please refresh the page.', 'error');
-                return;
-            }
-            
             try {
+                // All wallets connect to Solana by default
                 switch (walletType) {
                     case 'metamask':
                         await connectMetaMask();
+                        break;
+                    case 'phantom':
+                        await connectPhantom();
+                        break;
+                    case 'solflare':
+                        await connectSolflare();
                         break;
                     case 'trust-wallet':
                         await connectTrustWallet();
@@ -2332,7 +2304,7 @@
                         await connectCoinbaseWallet();
                         break;
                     case 'wallet-connect':
-                        await connectWalletConnect();
+                        await connectSolanaWalletConnect();
                         break;
                     default:
                         throw new Error(`Unsupported wallet type: ${walletType}`);
@@ -2345,12 +2317,16 @@
         
         // Connect to MetaMask
         async function connectMetaMask() {
+            console.log("Connecting to MetaMask...");
+            
             // Check if ethers is loaded
             if (typeof ethers === 'undefined') {
+                console.error('ethers.js library is not loaded');
                 throw new Error('ethers.js library is not loaded');
             }
             
             if (!window.ethereum) {
+                console.error("MetaMask is not installed");
                 throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
             }
             
@@ -2358,90 +2334,163 @@
             if (window.ethereum.isMetaMask) {
                 try {
                     // First request account access
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    console.log("Requesting account access...");
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    console.log("Accounts granted:", accounts);
+                    
+                    if (!accounts || accounts.length === 0) {
+                        throw new Error("No accounts provided by wallet");
+                    }
+                    
+                    // Create provider
+                    console.log("Creating Web3Provider...");
                     web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                    console.log("Web3Provider created:", web3Provider);
+                    
+                    // Check if we're on Solana network
+                    const chainId = await web3Provider.getNetwork().then(network => network.chainId);
+                    console.log("Current chain ID:", chainId);
+                    
+                    // Solana chain ID is 101
+                    if (chainId !== 101) {
+                        console.log("Switching to Solana network...");
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_switchEthereumChain',
+                                params: [{ chainId: '0x65' }], // 101 in hex
+                            });
+                        } catch (switchError) {
+                            // This error code indicates that the chain has not been added to MetaMask
+                            if (switchError.code === 4902) {
+                                console.log("Adding Solana network to MetaMask...");
+                                try {
+                                    await window.ethereum.request({
+                                        method: 'wallet_addEthereumChain',
+                                        params: [
+                                            {
+                                                chainId: '0x65',
+                                                chainName: 'Solana',
+                                                rpcUrls: ['https://api.mainnet-beta.solana.com'],
+                                                nativeCurrency: {
+                                                    name: 'Solana',
+                                                    symbol: 'SOL',
+                                                    decimals: 18
+                                                },
+                                                blockExplorerUrls: ['https://explorer.solana.com/']
+                                            }
+                                        ]
+                                    });
+                                } catch (addError) {
+                                    console.error("Failed to add Solana network:", addError);
+                                    throw new Error("Failed to add Solana network to MetaMask. Please add it manually.");
+                                }
+                            } else {
+                                console.error("Failed to switch to Solana network:", switchError);
+                                throw new Error("Please switch to Solana network in MetaMask.");
+                            }
+                        }
+                    }
+                    
+                    // Setup events
                     setupWalletEvents();
-                    updateAccountInfo();
+                    
+                    // Update account info
+                    await updateAccountInfo();
+                    
+                    return true;
                 } catch (error) {
+                    console.error("MetaMask connection error:", error);
                     throw new Error(`MetaMask connection failed: ${error.message}`);
                 }
             } else {
+                console.error("Not using MetaMask");
                 throw new Error("Please use MetaMask wallet");
             }
         }
         
-        // Connect to Trust Wallet
-        async function connectTrustWallet() {
-            // Trust Wallet injects itself as window.ethereum with isTrustWallet flag
-            if (!window.ethereum) {
-                throw new Error("Trust Wallet is not installed. Please install it from https://trustwallet.com/");
+        // Connect to Solflare Wallet
+        async function connectSolflare() {
+            console.log("Connecting to Solflare...");
+            
+            // Check if Solflare is available
+            if (!window.solflare) {
+                // Try to open Solflare website if not installed
+                window.open('https://solflare.com/', '_blank');
+                throw new Error("Solflare wallet is not installed. Please install it from https://solflare.com/");
             }
             
-            // Check if it's Trust Wallet
-            if (window.ethereum.isTrustWallet) {
-                web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-                await web3Provider.send("eth_requestAccounts", []);
-                setupWalletEvents();
-                updateAccountInfo();
-            } else {
-                // Try to open Trust Wallet app on mobile
-                if (window.location.protocol === 'https:') {
-                    window.open('https://link.trustwallet.com/open_url?coin_id=60&url=' + encodeURIComponent(window.location.href));
+            try {
+                // Request connection
+                const resp = await window.solflare.connect();
+                console.log("Solflare connected:", resp);
+                
+                if (resp.publicKey) {
+                    solanaPublicKey = resp.publicKey;
+                    solanaProvider = window.solflare;
+                    
+                    // Create Solana connection
+                    solanaConnection = new solanaWeb3.Connection(
+                        SUPPORTED_SOLANA_NETWORKS[DEFAULT_SOLANA_NETWORK].rpcUrl,
+                        'confirmed'
+                    );
+                    
+                    // Update UI
+                    updateSolanaAccountInfo();
+                    
+                    // Set up event listeners
+                    solanaProvider.on('connect', () => {
+                        console.log('Solflare connected');
+                        updateSolanaAccountInfo();
+                    });
+                    
+                    solanaProvider.on('disconnect', () => {
+                        console.log('Solflare disconnected');
+                        disconnectWallet();
+                    });
+                    
+                    solanaProvider.on('accountChanged', (accounts) => {
+                        console.log('Solflare account changed:', accounts);
+                        if (accounts.length > 0) {
+                            solanaPublicKey = accounts[0];
+                            updateSolanaAccountInfo();
+                        } else {
+                            disconnectWallet();
+                        }
+                    });
+                    
+                    return true;
                 } else {
-                    throw new Error("Trust Wallet requires HTTPS connection");
+                    throw new Error("No public key returned from Solflare");
                 }
+            } catch (error) {
+                console.error("Solflare connection error:", error);
+                throw new Error(`Solflare connection failed: ${error.message}`);
             }
         }
         
-        // Connect to Coinbase Wallet
-        async function connectCoinbaseWallet() {
-            // Check if Coinbase Wallet SDK is available
-            if (typeof CoinbaseWalletSDK === 'undefined') {
-                throw new Error("Coinbase Wallet SDK not loaded");
-            }
+        // Connect to Solana via WalletConnect
+        async function connectSolanaWalletConnect() {
+            console.log("Connecting to Solana via WalletConnect...");
             
-            // Initialize Coinbase Wallet SDK
-            const coinbaseWalletSdk = new CoinbaseWalletSDK({
-                appName: "unifa.launch",
-                appLogoUrl: "https://your-app-logo-url.com",
-                darkMode: true
-            });
-            
-            // Make Web3 provider
-            coinbaseWalletProvider = coinbaseWalletSdk.makeWeb3Provider(
-                SUPPORTED_CHAINS[DEFAULT_CHAIN_ID].rpcUrl,
-                DEFAULT_CHAIN_ID
-            );
-            
-            // Request accounts
-            await coinbaseWalletProvider.enable();
-            
-            // Set as current provider
-            web3Provider = new ethers.providers.Web3Provider(coinbaseWalletProvider);
-            setupWalletEvents();
-            updateAccountInfo();
-        }
-        
-        // Connect to WalletConnect
-        async function connectWalletConnect() {
             // Check if WalletConnect is available
             if (typeof WalletConnect === 'undefined') {
                 throw new Error("WalletConnect not loaded");
             }
             
-            // Create WalletConnect provider
+            // Create WalletConnect provider for Solana
             walletConnectProvider = new WalletConnect({
                 bridge: "https://bridge.walletconnect.org",
-                qrcodeModal: QRCodeModal
+                qrcodeModal: QRCodeModal,
+                chainId: 101, // Solana chainId
             });
             
             // Check if connection is already established
             if (!walletConnectProvider.connected) {
                 // Create session
                 await walletConnectProvider.createSession({
-                    chainId: DEFAULT_CHAIN_ID,
+                    chainId: 101,
                     rpc: {
-                        [DEFAULT_CHAIN_ID]: SUPPORTED_CHAINS[DEFAULT_CHAIN_ID].rpcUrl
+                        101: SUPPORTED_SOLANA_NETWORKS[DEFAULT_SOLANA_NETWORK].rpcUrl
                     }
                 });
             }
@@ -2452,14 +2501,20 @@
                     throw error;
                 }
                 
-                // Get accounts and chainId
-                const { accounts, chainId } = payload.params[0];
-                currentAccount = accounts[0];
-                currentChainId = chainId;
-                
-                // Set as current provider
-                web3Provider = new ethers.providers.Web3Provider(walletConnectProvider);
-                updateAccountInfo();
+                // Get accounts
+                const { accounts } = payload.params[0];
+                if (accounts && accounts.length > 0) {
+                    solanaPublicKey = new solanaWeb3.PublicKey(accounts[0]);
+                    
+                    // Create Solana connection
+                    solanaConnection = new solanaWeb3.Connection(
+                        SUPPORTED_SOLANA_NETWORKS[DEFAULT_SOLANA_NETWORK].rpcUrl,
+                        'confirmed'
+                    );
+                    
+                    // Update UI
+                    updateSolanaAccountInfo();
+                }
             });
             
             walletConnectProvider.on("session_update", (error, payload) => {
@@ -2467,12 +2522,14 @@
                     throw error;
                 }
                 
-                // Get updated accounts and chainId
-                const { accounts, chainId } = payload.params[0];
-                currentAccount = accounts[0];
-                currentChainId = chainId;
-                
-                updateAccountInfo();
+                // Get updated accounts
+                const { accounts } = payload.params[0];
+                if (accounts && accounts.length > 0) {
+                    solanaPublicKey = new solanaWeb3.PublicKey(accounts[0]);
+                    updateSolanaAccountInfo();
+                } else {
+                    disconnectWallet();
+                }
             });
             
             walletConnectProvider.on("disconnect", (error, payload) => {
@@ -2481,19 +2538,145 @@
             });
         }
         
+        // Connect to Phantom (Solana)
+        async function connectPhantom() {
+            console.log("Connecting to Phantom...");
+            
+            // Check if Solana is loaded
+            if (typeof solana === 'undefined') {
+                console.error('Solana is not loaded');
+                throw new Error('Solana is not loaded');
+            }
+            
+            // Check if Phantom is available
+            if (!window.phantom?.solana) {
+                console.error("Phantom is not installed");
+                throw new Error("Phantom is not installed. Please install it from https://phantom.app/");
+            }
+            
+            const provider = window.phantom.solana;
+            
+            // Check if it's actually Phantom
+            if (provider.isPhantom) {
+                try {
+                    // Request connection
+                    console.log("Requesting connection to Phantom...");
+                    const resp = await provider.connect();
+                    console.log("Phantom connected:", resp);
+                    
+                    if (resp.publicKey) {
+                        solanaPublicKey = resp.publicKey;
+                        solanaProvider = provider;
+                        
+                        // Create Solana connection
+                        solanaConnection = new solanaWeb3.Connection(
+                            SUPPORTED_SOLANA_NETWORKS[DEFAULT_SOLANA_NETWORK].rpcUrl,
+                            'confirmed'
+                        );
+                        
+                        // Update UI
+                        updateSolanaAccountInfo();
+                        
+                        // Set up event listeners
+                        provider.on('connect', () => {
+                            console.log('Phantom connected');
+                            updateSolanaAccountInfo();
+                        });
+                        
+                        provider.on('disconnect', () => {
+                            console.log('Phantom disconnected');
+                            disconnectWallet();
+                        });
+                        
+                        provider.on('accountChanged', (accounts) => {
+                            console.log('Phantom account changed:', accounts);
+                            if (accounts.length > 0) {
+                                solanaPublicKey = accounts[0];
+                                updateSolanaAccountInfo();
+                            } else {
+                                disconnectWallet();
+                            }
+                        });
+                        
+                        return true;
+                    } else {
+                        throw new Error("No public key returned from Phantom");
+                    }
+                } catch (error) {
+                    console.error("Phantom connection error:", error);
+                    throw new Error(`Phantom connection failed: ${error.message}`);
+                }
+            } else {
+                console.error("Not using Phantom");
+                throw new Error("Please use Phantom wallet");
+            }
+        }
+        
+        // Update Solana account information
+        async function updateSolanaAccountInfo() {
+            console.log("Updating Solana account info...");
+            
+            if (!solanaPublicKey) {
+                console.error("Solana public key is not available");
+                return;
+            }
+            
+            try {
+                // Get balance
+                const balance = await solanaConnection.getBalance(solanaPublicKey);
+                const solBalance = solanaWeb3.LAMPORTS_PER_SOL;
+                const formattedBalance = (balance / solBalance).toFixed(4);
+                
+                // Update UI
+                try {
+                    const desktopAddressElement = document.getElementById('connected-address');
+                    const mobileAddressElement = document.getElementById('mobile-connected-address');
+                    
+                    if (desktopAddressElement) {
+                        desktopAddressElement.textContent = formatAddress(solanaPublicKey.toBase58());
+                    } else {
+                        console.error("Desktop address element not found");
+                    }
+                    
+                    if (mobileAddressElement) {
+                        mobileAddressElement.textContent = formatAddress(solanaPublicKey.toBase58());
+                    } else {
+                        console.error("Mobile address element not found");
+                    }
+                    
+                    // Show connected UI
+                    document.getElementById('wallet-connect-button').classList.add('hidden');
+                    document.getElementById('wallet-connected').classList.remove('hidden');
+                    document.getElementById('wallet-connected').classList.add('flex');
+                    
+                    document.getElementById('mobile-wallet-connect-button').classList.add('hidden');
+                    document.getElementById('mobile-wallet-connected').classList.remove('hidden');
+                    
+                    // Show success message
+                    showNotification(`Connected to ${formatAddress(solanaPublicKey.toBase58())} (${formattedBalance} SOL)`);
+                } catch (uiError) {
+                    console.error("Error updating UI:", uiError);
+                }
+            } catch (error) {
+                console.error("Error updating Solana account info:", error);
+                showNotification(`Failed to update account info: ${error.message}`, 'error');
+            }
+        }
+        
         // Disconnect wallet
         function disconnectWallet() {
             if (walletConnectProvider && walletConnectProvider.connected) {
                 walletConnectProvider.killSession();
             }
             
-            if (coinbaseWalletProvider && coinbaseWalletProvider.disconnect) {
-                coinbaseWalletProvider.disconnect();
+            // Disconnect Solana wallet
+            if (solanaProvider && solanaProvider.disconnect) {
+                solanaProvider.disconnect();
             }
             
-            web3Provider = null;
-            currentAccount = null;
-            currentChainId = null;
+            solanaConnection = null;
+            solanaProvider = null;
+            solanaPublicKey = null;
             
             // Update UI
             document.getElementById('wallet-connect-button').classList.remove('hidden');
@@ -2508,61 +2691,35 @@
             showNotification("Wallet disconnected");
         }
         
-        // Switch network
-        async function switchNetwork(chainId) {
-            if (!window.ethereum) {
-                throw new Error("No wallet provider available");
-            }
-            
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: `0x${chainId.toString(16)}` }]
-                });
-            } catch (error) {
-                // This error code indicates that the chain has not been added to MetaMask
-                if (error.code === 4902) {
-                    const chainInfo = SUPPORTED_CHAINS[chainId];
-                    if (chainInfo) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: `0x${chainId.toString(16)}`,
-                                chainName: chainInfo.name,
-                                nativeCurrency: {
-                                    name: chainInfo.name,
-                                    symbol: chainInfo.symbol,
-                                    decimals: 18
-                                },
-                                rpcUrls: [chainInfo.rpcUrl],
-                                blockExplorerUrls: [chainInfo.blockExplorerUrl || '']
-                            }]
-                        });
-                    }
-                } else {
-                    throw error;
-                }
-            }
-        }
-        
-        // Show network selection
+        // Show network information
         function showNetwork() {
-            const chainId = currentChainId || DEFAULT_CHAIN_ID;
-            const currentChain = SUPPORTED_CHAINS[chainId] || { name: "Unknown Network" };
+            const currentNetwork = SUPPORTED_SOLANA_NETWORKS[DEFAULT_SOLANA_NETWORK];
             
             let html = `<div class="p-4">
-                <h3 class="font-bold mb-4">Select Network</h3>
-                <p class="text-sm text-gray-400 mb-4">Current: ${currentChain.name}</p>
-                <div class="space-y-2">`;
-            
-            for (const [id, chain] of Object.entries(SUPPORTED_CHAINS)) {
-                html += `<div class="p-2 bg-dark-500 rounded cursor-pointer hover:bg-dark-300 transition-colors" onclick="switchNetwork(${id}); closeWalletModal()">
-                    <div class="font-medium">${chain.name}</div>
-                    <div class="text-xs text-gray-400">${chain.symbol}</div>
-                </div>`;
-            }
-            
-            html += `</div></div>`;
+                <h3 class="font-bold mb-4">Network Information</h3>
+                <div class="p-4 bg-dark-500 rounded-lg mb-4">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-circle text-blue-400 mr-3"></i>
+                        <div>
+                            <div class="font-medium">${currentNetwork.name}</div>
+                            <div class="text-xs text-gray-400">${currentNetwork.rpcUrl}</div>
+                        </div>
+                    </div>
+                    <div class="text-sm">
+                        <div class="mb-2">
+                            <span class="text-gray-400">Symbol:</span>
+                            <span class="ml-2">${currentNetwork.symbol}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">Gas Fees:</span>
+                            <span class="ml-2">~$0.00025</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400">
+                    All tokens on unifa.launch are deployed on Solana. Network selection is not available as we exclusively use Solana for all token launches.
+                </p>
+            </div>`;
             
             // Show in modal
             document.getElementById('wallet-modal-content').innerHTML = html;
@@ -2571,9 +2728,16 @@
         
         // Copy address to clipboard
         function copyAddress() {
-            if (!currentAccount) return;
+            let address;
+            if (currentAccount) {
+                address = currentAccount;
+            } else if (solanaPublicKey) {
+                address = solanaPublicKey.toBase58();
+            }
             
-            navigator.clipboard.writeText(currentAccount)
+            if (!address) return;
+            
+            navigator.clipboard.writeText(address)
                 .then(() => {
                     showNotification("Address copied to clipboard");
                 })
@@ -2592,6 +2756,12 @@
         // Format address for display
         function formatAddress(address) {
             if (!address) return "0x...";
+            
+            // Check if it's a Solana address (longer than 42 characters)
+            if (address.length > 42) {
+                return address.substring(0, 4) + "..." + address.substring(address.length - 4);
+            }
+            
             return address.substring(0, 6) + "..." + address.substring(address.length - 4);
         }
         
@@ -2963,39 +3133,77 @@
             const modalContent = document.getElementById('wallet-modal-content');
             modalContent.innerHTML = `
                 <div class="p-4">
-                    <h3 class="font-bold mb-4">Connect Wallet</h3>
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold">Connect Wallet</h3>
+                        <div class="bg-primary-500 bg-opacity-20 text-primary-500 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                            <i class="fas fa-circle text-blue-400 mr-1"></i> Solana Network
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-300 text-sm mb-6">
+                        All tokens on unifa.launch are deployed on Solana. Please connect your Solana wallet to continue.
+                    </p>
+                    
                     <div class="space-y-3">
-                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('metamask')">
-                            <img src="https://logo.svgcdn.com/l/metamask-icon.svg" alt="MetaMask" class="w-6 h-6 mr-3">
+                        <div class="p-4 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center border-2 border-primary-500 border-opacity-30">
+                            <i class="fas fa-circle text-2xl mr-4 text-blue-400"></i>
                             <div>
-                                <div class="font-medium">MetaMask</div>
-                                <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
+                                <div class="font-medium text-lg">Phantom</div>
+                                <div class="text-xs text-gray-400">Recommended Solana wallet</div>
                             </div>
                         </div>
-                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('trust-wallet')">
-                            <i class="fas fa-shield-alt text-xl mr-3"></i>
+                        
+                        <div class="p-4 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center">
+                            <i class="fas fa-mobile-alt text-2xl mr-4 text-green-400"></i>
                             <div>
-                                <div class="font-medium">Trust Wallet</div>
-                                <div class="text-xs text-gray-400">Connect using browser extension or mobile app</div>
+                                <div class="font-medium text-lg">Solflare</div>
+                                <div class="text-xs text-gray-400">Mobile and browser extension</div>
                             </div>
                         </div>
-                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('coinbase')">
-                            <img src="https://static.cdnlogo.com/logos/c/12/coinbase.png" alt="Coinbase Wallet" class="w-6 h-6 mr-3">
+                        
+                        <div class="p-4 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center">
+                            <i class="fas fa-qrcode text-2xl mr-4 text-purple-400"></i>
                             <div>
-                                <div class="font-medium">Coinbase Wallet</div>
-                                <div class="text-xs text-gray-400">Connect using Coinbase Wallet app</div>
+                                <div class="font-medium text-lg">WalletConnect</div>
+                                <div class="text-xs text-gray-400">Connect any Solana-compatible wallet</div>
                             </div>
                         </div>
-                        <div class="p-3 bg-dark-500 rounded-lg cursor-pointer hover:bg-dark-300 transition-colors flex items-center" onclick="connectWallet('wallet-connect')">
-                            <i class="fas fa-qrcode text-xl mr-3"></i>
-                            <div>
-                                <div class="font-medium">WalletConnect</div>
-                                <div class="text-xs text-gray-400">Connect using QR code with any wallet</div>
-                            </div>
+                    </div>
+                    
+                    <div class="mt-8 p-4 bg-dark-500 rounded-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                            <h4 class="font-bold">Need a Solana Wallet?</h4>
+                        </div>
+                        <p class="text-gray-300 text-sm">
+                            Install Phantom, the most popular Solana wallet, to get started.
+                        </p>
+                        <div class="mt-4 flex justify-center">
+                            <a href="https://phantom.app" target="_blank" class="btn-primary">
+                                <i class="fas fa-download mr-2"></i> Download Phantom
+                            </a>
                         </div>
                     </div>
                 </div>
             `;
+            
+            // Add event listeners
+            setTimeout(() => {
+                const phantomOption = modalContent.querySelector('.border-primary-500');
+                if (phantomOption) {
+                    phantomOption.addEventListener('click', () => connectWallet('phantom'));
+                }
+                
+                const solflareOption = modalContent.querySelectorAll('.p-4.bg-dark-500')[1];
+                if (solflareOption) {
+                    solflareOption.addEventListener('click', () => connectWallet('solflare'));
+                }
+                
+                const walletConnectOption = modalContent.querySelectorAll('.p-4.bg-dark-500')[2];
+                if (walletConnectOption) {
+                    walletConnectOption.addEventListener('click', () => connectWallet('wallet-connect'));
+                }
+            }, 100);
             
             document.getElementById('wallet-modal').style.display = 'flex';
         }
@@ -3145,6 +3353,9 @@
             
             // Animate stats
             animateStats();
+            
+            // Initialize Solana
+            initSolana();
             
             // Mobile menu toggle
             document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
