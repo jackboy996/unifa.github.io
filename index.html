@@ -2220,18 +2220,25 @@
         const DEFAULT_CHAIN_ID = 5; // Goerli Testnet
         
         // Initialize Web3 provider
-        async function initWeb3() {
+        function initWeb3() {
+            // Check if ethers is loaded
+            if (typeof ethers === 'undefined') {
+                console.error('ethers.js library is not loaded');
+                showNotification('Failed to load required wallet libraries', 'error');
+                return;
+            }
+            
             // Check if user has any wallet installed
             if (window.ethereum) {
                 try {
-                    // Request account access
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    // Setup provider but don't request accounts automatically
                     web3Provider = new ethers.providers.Web3Provider(window.ethereum);
                     setupWalletEvents();
-                    updateAccountInfo();
                 } catch (error) {
-                    console.error("User denied account access", error);
+                    console.error("Failed to initialize provider", error);
                 }
+            } else {
+                showNotification('No wallet detected. Please install MetaMask or another wallet.', 'error');
             }
         }
         
@@ -2307,6 +2314,12 @@
         async function connectWallet(walletType) {
             closeWalletModal();
             
+            // Check if ethers is loaded
+            if (typeof ethers === 'undefined') {
+                showNotification('Wallet libraries not loaded. Please refresh the page.', 'error');
+                return;
+            }
+            
             try {
                 switch (walletType) {
                     case 'metamask':
@@ -2332,16 +2345,26 @@
         
         // Connect to MetaMask
         async function connectMetaMask() {
+            // Check if ethers is loaded
+            if (typeof ethers === 'undefined') {
+                throw new Error('ethers.js library is not loaded');
+            }
+            
             if (!window.ethereum) {
                 throw new Error("MetaMask is not installed. Please install it from https://metamask.io/");
             }
             
             // Check if it's actually MetaMask
             if (window.ethereum.isMetaMask) {
-                web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-                await web3Provider.send("eth_requestAccounts", []);
-                setupWalletEvents();
-                updateAccountInfo();
+                try {
+                    // First request account access
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                    setupWalletEvents();
+                    updateAccountInfo();
+                } catch (error) {
+                    throw new Error(`MetaMask connection failed: ${error.message}`);
+                }
             } else {
                 throw new Error("Please use MetaMask wallet");
             }
