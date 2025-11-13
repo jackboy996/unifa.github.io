@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>unifa.launch</title>
+    <link rel="icon" href="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/f00f5ae1790047349a6a0d322e334eaf.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=2025111021400558512F57C147FC26F81A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763386805&x-signature=Zw%2FQ617VPxzr3MAY%2FGPcURyW1og%3D" type="image/jpeg">
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4299e1',
+                        secondary: '#f7fafc',
+                        accent: '#63b3ed',
+                        dark: '#2d3748',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            .card-transition {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .card-transition:hover {
+                transform: translateY(-5px);
+            }
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #4299e1;
+            transition: width 0.5s ease;
+        }
+        
+        .btn-primary {
+            background-color: #4299e1;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary:disabled {
+            background-color: #90cdf4;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2d3748;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .wallet-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: #4299e1;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .wallet-btn:hover {
+            background-color: #3182ce;
+        }
+        
+        .wallet-btn:disabled {
+            background-color: #90cdf4;
+            cursor: not-allowed;
+        }
+        
+        .wallet-connected {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #e2e8f0;
+            color: #2d3748;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center mb-4 md:mb-0">
+                <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/f00f5ae1790047349a6a0d322e334eaf.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=2025111021400558512F57C147FC26F81A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763386805&x-signature=Zw%2FQ617VPxzr3MAY%2FGPcURyW1og%3D" alt="unifa.launch Logo" class="w-10 h-10 rounded-full mr-3">
+                <h1 class="text-2xl font-bold text-dark">unifa.launch</h1>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <nav class="flex gap-6 mb-4 md:mb-0">
+                    <button class="tab-btn text-primary font-medium border-b-2 border-primary" data-tab="creator">Creator Hub</button>
+                    <button class="tab-btn text-gray-600 font-medium border-b-2 border-transparent" data-tab="investor">Investor Plaza</button>
+                    <button class="tab-btn text-gray-600 font-medium border-b-2 border-transparent" data-tab="guide">Launch Guide</button>
+                </nav>
+                
+                <div id="wallet-connect-btn" class="wallet-btn">
+                    <i class="fa fa-wallet"></i>
+                    <span>Connect Wallet</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Creator Tab Content -->
+        <div id="creator-tab" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Creator Form Card -->
+                <div class="card">
+                    <h2 class="text-2xl font-bold mb-6 text-dark">Create New Token</h2>
+                    
+                    <form id="creator-form" class="space-y-6">
+                        <div>
+                            <label for="token-name" class="form-label">Token Name</label>
+                            <input type="text" id="token-name" class="form-input" placeholder="My Token" required>
+                        </div>
+                        
+                        <div>
+                            <label for="token-symbol" class="form-label">Token Symbol</label>
+                            <input type="text" id="token-symbol" class="form-input" placeholder="MTK" required>
+                        </div>
+                        
+                        <div>
+                            <label for="total-supply" class="form-label">Total Supply</label>
+                            <div class="relative">
+                                <input type="number" id="total-supply" class="form-input" placeholder="1000000" min="1" required>
+                                <span class="absolute right-3 top-3 text-gray-500">Tokens</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="price-sol" class="form-label">Price per SOL</label>
+                                <div class="relative">
+                                    <input type="number" id="price-sol" class="form-input" placeholder="0.01" min="0.0001" step="0.0001" required>
+                                    <span class="absolute right-3 top-3 text-gray-500">SOL</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="price-usdc" class="form-label">Price per USDC</label>
+                                <div class="relative">
+                                    <input type="number" id="price-usdc" class="form-input" placeholder="1.00" min="0.01" step="0.01" required>
+                                    <span class="absolute right-3 top-3 text-gray-500">USDC</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="target-amount" class="form-label">Target Amount</label>
+                            <div class="relative">
+                                <input type="number" id="target-amount" class="form-input" placeholder="100" min="1" step="0.1" required>
+                                <span class="absolute right-3 top-3 text-gray-500">SOL</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="reserve-ratio" class="form-label">Reserve Ratio</label>
+                            <div class="relative">
+                                <input type="range" id="reserve-ratio" class="form-input" min="10" max="50" value="20" required>
+                                <span id="reserve-ratio-value" class="absolute right-3 top-3 text-gray-500">20%</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" id="create-token-btn" class="btn-primary w-full">
+                            <i class="fa fa-plus-circle mr-2"></i>Create Token
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Launch Progress Card -->
+                <div class="card">
+                    <h2 class="text-2xl font-bold mb-6 text-dark">My Launch Progress</h2>
+                    
+                    <div id="no-token-message" class="text-center py-12">
+                        <i class="fa fa-info-circle text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500">You haven't created any tokens yet</p>
+                        <p class="text-gray-400 text-sm mt-2">Launch progress will be displayed here after creating a token</p>
+                    </div>
+                    
+                    <div id="token-progress" class="hidden space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 id="progress-token-name" class="text-xl font-semibold">My Token</h3>
+                            <span id="progress-token-status" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Live</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p class="text-gray-500">Token Symbol
+                                <p id="progress-token-symbol" class="font-medium">MTK</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Mint Address
+                                <p id="progress-mint-address" class="font-medium truncate">So11111111111111111111111111111111111111112</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Amount Raised
+                                <p id="progress-raised" class="font-medium">50 / 100 SOL</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Time Left
+                                <p id="progress-time-left" class="font-medium">5 天 12:34:56</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Launch Progress</span>
+                                <span id="progress-percentage">50%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="progress-bar-fill" class="progress-bar-fill" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-100">
+                            <h4 class="font-medium mb-3">Investor Statistics</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-500">Number of Investors
+                                    <p id="progress-investor-count" class="font-medium">25</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Average Investment
+                                    <p id="progress-avg-investment" class="font-medium">2 SOL</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Investor Tab Content -->
+        <div id="investor-tab" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6 text-dark">Available Tokens</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Token Card 1 -->
+                <div class="card card-transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold">SolanaLaunch</h3>
+                            <p class="text-gray-500 text-sm">SOLAUNCH</p>
+                        </div>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Live</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+                        <div>
+                            <p class="text-gray-500">Price
+                            <p class="font-medium">0.01 SOL</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Remaining
+                            <p class="font-medium">50,000 / 100,000</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Raised: 50 / 100 SOL</span>
+                            <span>50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between text-xs text-gray-500 mb-4">
+                        <span>Time Left: 5 days</span>
+                        <span>Investors: 25</span>
+                    </div>
+                    
+                    <button class="btn-primary w-full buy-token-btn" data-token-id="1">
+                        <i class="fa fa-shopping-cart mr-2"></i>Buy
+                    </button>
+                </div>
+                
+                <!-- Token Card 2 -->
+                <div class="card card-transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold">DeFiFuture</h3>
+                            <p class="text-gray-500 text-sm">DEFI</p>
+                        </div>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Live</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+                        <div>
+                            <p class="text-gray-500">Price
+                            <p class="font-medium">0.005 SOL</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Remaining
+                            <p class="font-medium">150,000 / 200,000</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Raised: 25 / 50 SOL</span>
+                            <span>50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between text-xs text-gray-500 mb-4">
+                        <span>Time Left: 3 days</span>
+                        <span>Investors: 15</span>
+                    </div>
+                    
+                    <button class="btn-primary w-full buy-token-btn" data-token-id="2">
+                        <i class="fa fa-shopping-cart mr-2"></i>Buy
+                    </button>
+                </div>
+                
+                <!-- Token Card 3 -->
+                <div class="card card-transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold">NFTGalaxy</h3>
+                            <p class="text-gray-500 text-sm">NFTG</p>
+                        </div>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Live</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+                        <div>
+                            <p class="text-gray-500">Price
+                            <p class="font-medium">0.02 SOL</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Remaining
+                            <p class="font-medium">75,000 / 150,000</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Raised: 150 / 200 SOL</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between text-xs text-gray-500 mb-4">
+                        <span>Time Left: 6 days</span>
+                        <span>Investors: 40</span>
+                    </div>
+                    
+                    <button class="btn-primary w-full buy-token-btn" data-token-id="3">
+                        <i class="fa fa-shopping-cart mr-2"></i>Buy
+                    </button>
+                </div>
+            </div>
+            
+            <!-- My Purchases Section -->
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold mb-6 text-dark">My Purchases</h2>
+                
+                <div id="no-purchases-message" class="text-center py-12">
+                    <i class="fa fa-shopping-bag text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-500">You haven't made any purchases yet</p>
+                    <p class="text-gray-400 text-sm mt-2">Purchases will be displayed here after buying tokens</p>
+                </div>
+                
+                <div id="purchases-list" class="hidden space-y-4">
+                    <!-- Purchase Item 1 -->
+                    <div class="card p-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-semibold">SolanaLaunch (SOLAUNCH)</h4>
+                                <p class="text-sm text-gray-500">Purchase Time: 2023-06-15 14:30
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">10,000 SOLAUNCH</p>
+                                <p class="text-sm text-gray-500">Paid: 0.1 SOL
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Purchase Item 2 -->
+                    <div class="card p-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-semibold">NFTGalaxy (NFTG)</h4>
+                                <p class="text-sm text-gray-500">Purchase Time: 2023-06-10 09:15
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">5,000 NFTG</p>
+                                <p class="text-sm text-gray-500">Paid: 0.1 SOL
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Guide Tab Content -->
+        <div id="guide-tab" class="tab-content">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-6 text-dark">Launch Guide</h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Creator Process</h3>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                            <li>Connect Phantom Wallet</li>
+                            <li>Fill in token parameters (name, symbol, total supply, price, etc.)</li>
+                            <li>Set target amount and reserve ratio (10%-50%)</li>
+                            <li>Submit form and pay a small amount of SOL as gas fee</li>
+                            <li>Wait for investors to purchase your tokens</li>
+                            <li>Automatically create Raydium LP after reaching the target (within 7 days)</li>
+                            <li>Automatic refund to investors if target not reached</li>
+                        </ol>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Investor Process</h3>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                            <li>Connect Phantom Wallet</li>
+                            <li>Browse available token list</li>
+                            <li>Select the token you are interested in</li>
+                            <li>Click the "Buy" button</li>
+                            <li>Choose payment method (SOL or USDC)</li>
+                            <li>Confirm transaction and pay</li>
+                            <li>Receive tokens and trade on Raydium after target is reached</li>
+                            <li>Automatically receive refund if target not reached</li>
+                        </ol>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Key Rules</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            <li>Launch period is 7 days</li>
+                            <li>Success condition: Raised amount meets or exceeds target amount</li>
+                            <li>LP creation ratio: 100% of raised funds + reserved tokens</li>
+                            <li>Refund timing: Automatic refund within 24 hours after expiration</li>
+                            <li>Payment methods: SOL and USDC-SPL supported</li>
+                            <li>Token standard: SPL token (8 decimal places)</li>
+                            <li>All transactions occur on the Solana blockchain, ensuring transparency and traceability</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Fee Structure</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            <li>Creator token creation: Small SOL gas fee required</li>
+                            <li>Investor token purchase: No additional fees, only token price</li>
+                            <li>Platform does not charge any fees</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Security Tips</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            <li>Ensure you use this platform in a secure network environment</li>
+                            <li>Carefully verify token information to avoid purchasing counterfeit tokens</li>
+                            <li>Only operate on official websites and be vigilant against phishing sites</li>
+                            <li>Investment involves risks, please be cautious when entering the market</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 flex space-x-4">
+                    <a href="#" class="text-primary hover:text-blue-700 transition-colors">
+                        <i class="fa fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-primary hover:text-blue-700 transition-colors">
+                        <i class="fa fa-telegram text-xl"></i>
+                    </a>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-4">
+                    <a href="https://raydium.io" target="_blank" class="text-primary hover:underline text-sm">Raydium LP</a>
+                    <a href="https://explorer.solana.com" target="_blank" class="text-primary hover:underline text-sm">Solana Explorer</a>
+                    <a href="https://phantom.app" target="_blank" class="text-primary hover:underline text-sm">Phantom Wallet</a>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100 text-center text-gray-400 text-sm">
+                <p>© 2023 Solana 402 Launchpad. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Buy Token Modal -->
+    <div id="buy-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg w-full max-w-md p-6 mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold" id="modal-token-name">SolanaLaunch</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                    <div>
+                        <p class="text-gray-500">Token Symbol
+                        <p id="modal-token-symbol" class="font-medium">SOLAUNCH</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Price
+                        <p id="modal-token-price" class="font-medium">0.01 SOL</p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="payment-method" class="form-label">Payment Method
+                    <select id="payment-method" class="form-input">
+                        <option value="sol">SOL</option>
+                        <option value="usdc">USDC</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="purchase-amount" class="form-label">Purchase Amount
+                    <div class="relative">
+                        <input type="number" id="purchase-amount" class="form-input" placeholder="1" min="0.01" step="0.01">
+                        <span id="payment-token-symbol" class="absolute right-3 top-3 text-gray-500">SOL</span>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Estimated Tokens
+                        <span id="estimated-tokens" class="font-medium">100 SOLAUNCH</span>
+                    </div>
+                </div>
+                
+                <button id="confirm-purchase" class="btn-primary w-full">
+                    <i class="fa fa-check-circle mr-2"></i>Confirm Purchase
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm transform translate-y-full opacity-0 transition-all duration-300 z-50">
+        <div class="flex items-start">
+            <div id="notification-icon" class="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <i class="fa fa-check text-green-600"></i>
+            </div>
+            <div class="flex-1">
+                <h4 id="notification-title" class="font-medium text-gray-900">Operation Successful</h4>
+                <p id="notification-message" class="text-sm text-gray-500 mt-1">Your operation has been completed successfully</p>
+            </div>
+            <button id="close-notification" class="text-gray-400 hover:text-gray-600 ml-4">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="js/wallet-connect.js"></script>
+    <script>
+        // Tab Switching
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    
+                    // Update tab buttons
+                    tabBtns.forEach(b => {
+                        b.classList.remove('text-primary', 'border-primary');
+                        b.classList.add('text-gray-600', 'border-transparent');
+                    });
+                    btn.classList.remove('text-gray-600', 'border-transparent');
+                    btn.classList.add('text-primary', 'border-primary');
+                    
+                    // Update tab contents
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Reserve Ratio Slider
+            const reserveRatioSlider = document.getElementById('reserve-ratio');
+            const reserveRatioValue = document.getElementById('reserve-ratio-value');
+            
+            if (reserveRatioSlider && reserveRatioValue) {
+                reserveRatioSlider.addEventListener('input', () => {
+                    reserveRatioValue.textContent = `${reserveRatioSlider.value}%`;
+                });
+            }
+            
+            // Buy Token Modal
+            const buyButtons = document.querySelectorAll('.buy-token-btn');
+            const buyModal = document.getElementById('buy-modal');
+            const closeModal = document.getElementById('close-modal');
+            const modalTokenName = document.getElementById('modal-token-name');
+            const modalTokenSymbol = document.getElementById('modal-token-symbol');
+            const modalTokenPrice = document.getElementById('modal-token-price');
+            const paymentMethod = document.getElementById('payment-method');
+            const paymentTokenSymbol = document.getElementById('payment-token-symbol');
+            const purchaseAmount = document.getElementById('purchase-amount');
+            const estimatedTokens = document.getElementById('estimated-tokens');
+            
+            buyButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Check if wallet is connected
+                    if (!window.WalletConnect.isConnected()) {
+                        showNotification('Error', 'Please connect your wallet first', 'error');
+                        return;
+                    }
+                    
+                    const tokenId = btn.getAttribute('data-token-id');
+                    // In a real app, you would fetch token details from API
+                    // For demo, we'll use static data
+                    
+                    let tokenName, tokenSymbol, tokenPrice;
+                    
+                    if (tokenId === '1') {
+                        tokenName = 'SolanaLaunch';
+                        tokenSymbol = 'SOLAUNCH';
+                        tokenPrice = '0.01 SOL';
+                    } else if (tokenId === '2') {
+                        tokenName = 'DeFiFuture';
+                        tokenSymbol = 'DEFI';
+                        tokenPrice = '0.005 SOL';
+                    } else if (tokenId === '3') {
+                        tokenName = 'NFTGalaxy';
+                        tokenSymbol = 'NFTG';
+                        tokenPrice = '0.02 SOL';
+                    }
+                    
+                    modalTokenName.textContent = tokenName;
+                    modalTokenSymbol.textContent = tokenSymbol;
+                    modalTokenPrice.textContent = tokenPrice;
+                    
+                    buyModal.classList.remove('hidden');
+                });
+            });
+            
+            if (closeModal) {
+                closeModal.addEventListener('click', () => {
+                    buyModal.classList.add('hidden');
+                });
+            }
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === buyModal) {
+                    buyModal.classList.add('hidden');
+                }
+            });
+            
+            // Update payment token symbol
+            if (paymentMethod && paymentTokenSymbol) {
+                paymentMethod.addEventListener('change', () => {
+                    paymentTokenSymbol.textContent = paymentMethod.value.toUpperCase();
+                    updateEstimatedTokens();
+                });
+            }
+            
+            // Update estimated tokens when amount changes
+            if (purchaseAmount && estimatedTokens) {
+                purchaseAmount.addEventListener('input', updateEstimatedTokens);
+            }
+            
+            function updateEstimatedTokens() {
+                if (!purchaseAmount.value || purchaseAmount.value <= 0) {
+                    estimatedTokens.textContent = '0 SOLAUNCH';
+                    return;
+                }
+                
+                const tokenSymbol = modalTokenSymbol.textContent;
+                let price = parseFloat(modalTokenPrice.textContent);
+                
+                // For USDC, we'll assume 1 USDC = 1 SOL for demo purposes
+                if (paymentMethod.value === 'usdc') {
+                    price = price * 1; // This would be dynamic in a real app
+                }
+                
+                const tokens = (purchaseAmount.value / price).toFixed(0);
+                estimatedTokens.textContent = `${tokens} ${tokenSymbol}`;
+            }
+            
+            // Confirm Purchase
+            const confirmPurchase = document.getElementById('confirm-purchase');
+            
+            if (confirmPurchase) {
+                confirmPurchase.addEventListener('click', () => {
+                    // Check if wallet is connected
+                    if (!window.WalletConnect.isConnected()) {
+                        showNotification('Error', 'Please connect your wallet first', 'error');
+                        return;
+                    }
+                    
+                    if (!purchaseAmount.value || purchaseAmount.value <= 0) {
+                        showNotification('Error', 'Please enter a valid purchase amount', 'error');
+                        return;
+                    }
+                    
+                    // In a real app, this would trigger the wallet transaction
+                    showNotification('Info', 'Preparing purchase transaction...', 'info');
+                    
+                    // Simulate transaction delay
+                    setTimeout(() => {
+                        showNotification('Success', 'Purchase transaction submitted, please confirm in your wallet', 'success');
+                        buyModal.classList.add('hidden');
+                        
+                        // For demo, show purchase in history after 3 seconds
+                        setTimeout(() => {
+                            document.getElementById('no-purchases-message').classList.add('hidden');
+                            document.getElementById('purchases-list').classList.remove('hidden');
+                        }, 3000);
+                    }, 1500);
+                });
+            }
+            
+            // Creator Form Submission
+            const creatorForm = document.getElementById('creator-form');
+            
+            if (creatorForm) {
+                creatorForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Check if wallet is connected
+                    if (!window.WalletConnect.isConnected()) {
+                        showNotification('Error', 'Please connect your wallet first', 'error');
+                        return;
+                    }
+                    
+                    // Form validation
+                    const tokenName = document.getElementById('token-name').value;
+                    const tokenSymbol = document.getElementById('token-symbol').value;
+                    const totalSupply = document.getElementById('total-supply').value;
+                    const priceSol = document.getElementById('price-sol').value;
+                    const priceUsdc = document.getElementById('price-usdc').value;
+                    const targetAmount = document.getElementById('target-amount').value;
+                    const reserveRatio = document.getElementById('reserve-ratio').value;
+                    
+                    if (!tokenName || !tokenSymbol || !totalSupply || !priceSol || !priceUsdc || !targetAmount) {
+                        showNotification('Error', 'Please fill in all required fields', 'error');
+                        return;
+                    }
+                    
+                    if (totalSupply <= 0 || priceSol <= 0 || priceUsdc <= 0 || targetAmount <= 0) {
+                        showNotification('Error', 'Value must be greater than 0', 'error');
+                        return;
+                    }
+                    
+                    if (reserveRatio < 10 || reserveRatio > 50) {
+                        showNotification('Error', 'Reserve ratio must be between 10%-50%', 'error');
+                        return;
+                    }
+                    
+                    // In a real app, this would validate and submit the form
+                    showNotification('Info', 'Preparing token creation transaction...', 'info');
+                    
+                    // Simulate transaction delay
+                    setTimeout(() => {
+                        showNotification('Success', 'Token creation transaction submitted, please confirm in your wallet', 'success');
+                        
+                        // For demo, show progress after 3 seconds
+                        setTimeout(() => {
+                            document.getElementById('no-token-message').classList.add('hidden');
+                            document.getElementById('token-progress').classList.remove('hidden');
+                            
+                            // Update progress card with form data
+                            document.getElementById('progress-token-name').textContent = tokenName;
+                            document.getElementById('progress-token-symbol').textContent = tokenSymbol;
+                            document.getElementById('progress-token-status').textContent = 'Pending Launch';
+                            document.getElementById('progress-token-status').className = 'px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium';
+                        }, 3000);
+                    }, 1500);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
