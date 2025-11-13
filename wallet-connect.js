@@ -1,162 +1,173 @@
 /**
- * Solana 402 Launchpad - Wallet Connect Module
- * 实现Phantom钱包连接功能
+ * unifa.launch - Wallet Connection Module
+ * Handles Phantom wallet integration for Solana
  */
 
-// 全局变量
+// Global variables
 let connectedWallet = null;
 let walletProvider = null;
 
-// DOM元素
+// DOM elements
 const walletConnectBtn = document.getElementById('wallet-connect-btn');
 const createTokenBtn = document.getElementById('create-token-btn');
 const buyButtons = document.querySelectorAll('.buy-token-btn');
 
-// 初始化
+// Initialize when document is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // 检查是否已安装Phantom钱包
+    // Check if Phantom wallet is installed
     checkPhantomInstallation();
     
-    // 绑定钱包连接按钮事件
+    // Bind wallet connect button event
     if (walletConnectBtn) {
         walletConnectBtn.addEventListener('click', handleWalletConnect);
     }
     
-    // 初始禁用需要钱包连接的按钮
+    // Initially disable buttons that require wallet connection
     disableWalletRequiredButtons();
 });
 
 /**
- * 检查Phantom钱包是否已安装
+ * Check if Phantom wallet is installed
  */
 function checkPhantomInstallation() {
     if (window.solana && window.solana.isPhantom) {
-        console.log('Phantom钱包已安装');
+        console.log('Phantom wallet detected');
         walletProvider = window.solana;
         
-        // 监听钱包连接状态变化
-        walletProvider.on('connect', handleWalletConnect);
-        walletProvider.on('disconnect', handleWalletDisconnect);
-        walletProvider.on('accountChanged', handleAccountChange);
+        // Listen for wallet events
+        walletProvider.on('connect', (accounts) => {
+            connectedWallet = accounts[0];
+            handleWalletConnect();
+        });
         
-        // 检查是否已连接
+        walletProvider.on('disconnect', () => {
+            connectedWallet = null;
+            handleWalletDisconnect();
+        });
+        
+        walletProvider.on('accountChanged', (accounts) => {
+            if (accounts.length > 0) {
+                connectedWallet = accounts[0];
+                handleAccountChange();
+            } else {
+                handleWalletDisconnect();
+            }
+        });
+        
+        // Check if already connected
         if (walletProvider.isConnected) {
+            connectedWallet = walletProvider.publicKey.toString();
             handleWalletConnect();
         }
     } else {
-        console.log('未检测到Phantom钱包');
-        showNotification('错误', '请安装Phantom钱包后再试', 'error');
+        console.log('Phantom wallet not detected');
+        showNotification('Error', 'Please install Phantom wallet to continue', 'error');
         disableWalletConnectButton();
     }
 }
 
 /**
- * 处理钱包连接
+ * Handle wallet connection
  */
 async function handleWalletConnect() {
     try {
         if (!walletProvider) {
-            showNotification('错误', '未检测到Phantom钱包', 'error');
+            showNotification('Error', 'Phantom wallet not detected', 'error');
             return;
         }
         
-        // 如果已连接，则断开连接
+        // If already connected, disconnect
         if (walletProvider.isConnected) {
             await walletProvider.disconnect();
             return;
         }
         
-        // 请求连接钱包
-        const accounts = await walletProvider.connect();
+        // Request connection
+        const accounts = await walletProvider.connect({ onlyIfTrusted: false });
         
         if (accounts.length > 0) {
             connectedWallet = accounts[0];
-            console.log('钱包已连接:', connectedWallet);
+            console.log('Wallet connected:', connectedWallet);
             
-            // 更新UI
+            // Update UI
             updateWalletButtonUI(true);
             enableWalletRequiredButtons();
             
-            // 显示成功通知
-            showNotification('成功', '钱包已连接', 'success');
+            // Show success notification
+            showNotification('Success', 'Wallet connected successfully', 'success');
             
-            // 加载用户数据
+            // Load user data
             loadUserData();
         }
     } catch (error) {
-        console.error('钱包连接失败:', error);
-        showNotification('错误', '钱包连接失败: ' + error.message, 'error');
+        console.error('Wallet connection error:', error);
+        showNotification('Error', 'Failed to connect wallet: ' + error.message, 'error');
     }
 }
 
 /**
- * 处理钱包断开连接
+ * Handle wallet disconnection
  */
 function handleWalletDisconnect() {
-    console.log('钱包已断开连接');
+    console.log('Wallet disconnected');
     connectedWallet = null;
     
-    // 更新UI
+    // Update UI
     updateWalletButtonUI(false);
     disableWalletRequiredButtons();
     
-    // 显示通知
-    showNotification('信息', '钱包已断开连接', 'info');
+    // Show notification
+    showNotification('Info', 'Wallet disconnected', 'info');
     
-    // 清除用户数据
+    // Clear user data
     clearUserData();
 }
 
 /**
- * 处理账户切换
+ * Handle account change
  */
-function handleAccountChange(accounts) {
-    if (accounts.length > 0) {
-        connectedWallet = accounts[0];
-        console.log('账户已切换:', connectedWallet);
-        
-        // 更新UI
-        updateWalletButtonUI(true);
-        
-        // 显示通知
-        showNotification('信息', '账户已切换', 'info');
-        
-        // 重新加载用户数据
-        loadUserData();
-    } else {
-        handleWalletDisconnect();
-    }
+function handleAccountChange() {
+    console.log('Account changed:', connectedWallet);
+    
+    // Update UI
+    updateWalletButtonUI(true);
+    
+    // Show notification
+    showNotification('Info', 'Account switched successfully', 'info');
+    
+    // Reload user data
+    loadUserData();
 }
 
 /**
- * 更新钱包按钮UI
- * @param {boolean} isConnected - 是否已连接
+ * Update wallet button UI based on connection status
+ * @param {boolean} isConnected - Whether wallet is connected
  */
 function updateWalletButtonUI(isConnected) {
     if (!walletConnectBtn) return;
     
     if (isConnected && connectedWallet) {
-        // 显示已连接状态
+        // Show connected state
         const truncatedAddress = truncateWalletAddress(connectedWallet);
         walletConnectBtn.innerHTML = `
-            <i class="fa fa-wallet"></i>
+            <i class="fa fa-wallet mr-2"></i>
             <span>${truncatedAddress}</span>
         `;
         walletConnectBtn.classList.remove('wallet-btn');
-        walletConnectBtn.classList.add('wallet-connected');
+        walletConnectBtn.classList.add('wallet-connected', 'bg-gray-600', 'hover:bg-gray-700');
     } else {
-        // 显示连接按钮
+        // Show connect button
         walletConnectBtn.innerHTML = `
-            <i class="fa fa-wallet"></i>
-            <span>连接钱包</span>
+            <i class="fa fa-wallet mr-2"></i>
+            <span>Connect Wallet</span>
         `;
-        walletConnectBtn.classList.remove('wallet-connected');
-        walletConnectBtn.classList.add('wallet-btn');
+        walletConnectBtn.classList.remove('wallet-connected', 'bg-gray-600', 'hover:bg-gray-700');
+        walletConnectBtn.classList.add('wallet-btn', 'bg-primary', 'hover:bg-accent');
     }
 }
 
 /**
- * 启用需要钱包连接的按钮
+ * Enable buttons that require wallet connection
  */
 function enableWalletRequiredButtons() {
     if (createTokenBtn) {
@@ -169,7 +180,7 @@ function enableWalletRequiredButtons() {
 }
 
 /**
- * 禁用需要钱包连接的按钮
+ * Disable buttons that require wallet connection
  */
 function disableWalletRequiredButtons() {
     if (createTokenBtn) {
@@ -182,49 +193,54 @@ function disableWalletRequiredButtons() {
 }
 
 /**
- * 禁用钱包连接按钮
+ * Disable wallet connect button (when Phantom not installed)
  */
 function disableWalletConnectButton() {
     if (!walletConnectBtn) return;
     
     walletConnectBtn.disabled = true;
     walletConnectBtn.innerHTML = `
-        <i class="fa fa-exclamation-circle"></i>
-        <span>请安装Phantom钱包</span>
+        <i class="fa fa-exclamation-circle mr-2"></i>
+        <span>Install Phantom</span>
     `;
+    walletConnectBtn.classList.remove('bg-primary', 'hover:bg-accent');
+    walletConnectBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
 }
 
 /**
- * 加载用户数据
- * 在实际应用中，这里会从API获取用户的代币和购买记录
+ * Load user data from API
  */
 function loadUserData() {
-    console.log('加载用户数据...');
+    console.log('Loading user data...');
     
-    // 模拟加载创作者数据
+    // Simulated data loading for creator
     if (document.getElementById('no-token-message')) {
-        // 在实际应用中，这里会检查用户是否有创建的代币
-        // 这里简单模拟显示进度卡片
-        // document.getElementById('no-token-message').classList.add('hidden');
-        // document.getElementById('token-progress').classList.remove('hidden');
+        // In a real app, check if user has created tokens via API
+        // For demo, just show progress after short delay
+        setTimeout(() => {
+            document.getElementById('no-token-message').classList.add('hidden');
+            document.getElementById('token-progress').classList.remove('hidden');
+        }, 1000);
     }
     
-    // 模拟加载投资者数据
+    // Simulated data loading for investor
     if (document.getElementById('no-purchases-message')) {
-        // 在实际应用中，这里会检查用户是否有购买记录
-        // 这里简单模拟显示购买记录
-        // document.getElementById('no-purchases-message').classList.add('hidden');
-        // document.getElementById('purchases-list').classList.remove('hidden');
+        // In a real app, check user purchases via API
+        // For demo, show purchases after short delay
+        setTimeout(() => {
+            document.getElementById('no-purchases-message').classList.add('hidden');
+            document.getElementById('purchases-list').classList.remove('hidden');
+        }, 1500);
     }
 }
 
 /**
- * 清除用户数据
+ * Clear user data when wallet disconnects
  */
 function clearUserData() {
-    console.log('清除用户数据...');
+    console.log('Clearing user data...');
     
-    // 隐藏创作者进度卡片
+    // Hide creator progress
     if (document.getElementById('token-progress')) {
         document.getElementById('token-progress').classList.add('hidden');
     }
@@ -233,7 +249,7 @@ function clearUserData() {
         document.getElementById('no-token-message').classList.remove('hidden');
     }
     
-    // 隐藏投资者购买记录
+    // Hide investor purchases
     if (document.getElementById('purchases-list')) {
         document.getElementById('purchases-list').classList.add('hidden');
     }
@@ -244,9 +260,9 @@ function clearUserData() {
 }
 
 /**
- * 截断钱包地址显示
- * @param {string} address - 完整钱包地址
- * @returns {string} 截断后的地址
+ * Truncate wallet address for display
+ * @param {string} address - Full wallet address
+ * @returns {string} Truncated address
  */
 function truncateWalletAddress(address) {
     if (!address || address.length <= 10) return address;
@@ -254,10 +270,10 @@ function truncateWalletAddress(address) {
 }
 
 /**
- * 显示通知
- * @param {string} title - 通知标题
- * @param {string} message - 通知内容
- * @param {string} type - 通知类型：success, error, warning, info
+ * Show notification to user
+ * @param {string} title - Notification title
+ * @param {string} message - Notification content
+ * @param {string} type - Notification type: success, error, warning, info
  */
 function showNotification(title, message, type = 'success') {
     const notification = document.getElementById('notification');
@@ -271,7 +287,7 @@ function showNotification(title, message, type = 'success') {
     notificationTitle.textContent = title;
     notificationMessage.textContent = message;
     
-    // 设置图标基于类型
+    // Set icon based on type
     if (notificationIcon) {
         if (type === 'success') {
             notificationIcon.className = 'flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mr-3';
@@ -288,15 +304,15 @@ function showNotification(title, message, type = 'success') {
         }
     }
     
-    // 显示通知
+    // Show notification
     notification.classList.remove('translate-y-full', 'opacity-0');
     
-    // 5秒后自动隐藏
+    // Auto hide after 5 seconds
     const hideTimeout = setTimeout(() => {
         hideNotification();
     }, 5000);
     
-    // 关闭按钮
+    // Close button handler
     if (closeNotification) {
         closeNotification.onclick = () => {
             clearTimeout(hideTimeout);
@@ -304,14 +320,18 @@ function showNotification(title, message, type = 'success') {
         };
     }
     
+    /**
+     * Hide notification with animation
+     */
     function hideNotification() {
         notification.classList.add('translate-y-full', 'opacity-0');
     }
 }
 
-// 导出函数以便其他模块使用
+// Export functions for other modules
 window.WalletConnect = {
     isConnected: () => !!connectedWallet,
     getConnectedWallet: () => connectedWallet,
     connect: handleWalletConnect
 };
+    
